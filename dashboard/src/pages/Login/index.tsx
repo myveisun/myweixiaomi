@@ -10,12 +10,11 @@ import { authApi, type OidcStatus } from "../../api/modules/auth";
 import { apiErrorMessage } from "../../utils/apiError";
 import { refreshServerLabels } from "../../i18n";
 import { applyUserLocale, applyGuestLocale } from "../../utils/locale";
-import { useTheme } from "../../context/ThemeContext";
+import BrandMark from "../../components/BrandMark";
 import SlideCaptcha from "./SlideCaptcha";
 
 export default function LoginPage() {
   const { t } = useTranslation();
-  const { isDark } = useTheme();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [username, setUsername] = useState("");
@@ -131,17 +130,7 @@ export default function LoginPage() {
           margin: "0 16px",
         }}
       >
-        <img
-          src={isDark ? "/logo_name_dark.png" : "/logo_name.png"}
-          alt="Octop"
-          style={{
-            height: 48,
-            width: "auto",
-            maxWidth: 260,
-            objectFit: "contain",
-            display: "block",
-          }}
-        />
+        <BrandMark icon={52} text={24} gap={14} />
 
         <h2
           style={{

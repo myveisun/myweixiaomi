@@ -21,7 +21,7 @@ import {
   Settings,
   Palette,
   CircleHelp,
-  Github,
+  Globe,
   RefreshCw,
   KeyRound,
 } from "lucide-react";
@@ -46,7 +46,7 @@ import type { LayoutMode } from "../layouts/layoutModeStorage";
 import { userCan } from "../utils/permissions";
 import styles from "./AvatarDropdown.module.less";
 
-const GITHUB_URL = "https://github.com/TencentCloud/Octop";
+const PROJECT_URL = "https://www.veisun.net";
 
 interface AvatarDropdownProps {
   user: OctopUser | null;
@@ -230,7 +230,7 @@ export default function AvatarDropdown({
 
       <a
         className={styles.menuItem}
-        href="https://tencentcloud.github.io/Octop/"
+        href="https://www.veisun.net"
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => setMenuOpen(false)}
@@ -241,12 +241,12 @@ export default function AvatarDropdown({
 
       <a
         className={styles.menuItem}
-        href={GITHUB_URL}
+        href={PROJECT_URL}
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => setMenuOpen(false)}
       >
-        <Github size={16} strokeWidth={1.8} />
+        <Globe size={16} strokeWidth={1.8} />
         <span>{t("account.projectUrl")}</span>
       </a>
 

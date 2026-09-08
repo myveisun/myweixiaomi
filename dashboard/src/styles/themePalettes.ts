@@ -25,7 +25,8 @@ export const VALID_PALETTES: ThemePalette[] = [
 /** Curated palettes only — "custom" is handled separately via a hex value. */
 export const CURATED_PALETTES: ThemePalette[] = [...VALID_PALETTES];
 
-export const DEFAULT_PALETTE: ThemePalette = "rose";
+// 威小蜜AI / VS Agent 默认品牌强调色：与 LOGO 蓝同源的 tech 蓝色系。
+export const DEFAULT_PALETTE: ThemePalette = "tech";
 export const DEFAULT_CUSTOM_COLOR = "#4B74FA";
 
 /** True when the value is one of the curated palette keys (not "custom"/hex). */

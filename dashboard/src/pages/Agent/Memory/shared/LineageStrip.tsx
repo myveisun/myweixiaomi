@@ -74,7 +74,7 @@ export default function LineageStrip({ agentId, atom }: Props) {
     return (
       <div style={lineageBox}>
         <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-          🧬 由 Octop 从对话中提取
+          🧬 由威小蜜AI 从对话中提取
         </Typography.Text>
       </div>
     );

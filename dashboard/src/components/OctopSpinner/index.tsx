@@ -1,6 +1,6 @@
 import styles from "./OctopSpinner.module.less";
 
-const LOGO = `${import.meta.env.BASE_URL}logo.svg`;
+const LOGO = `${import.meta.env.BASE_URL}logo-icon.png`;
 
 interface OctopSpinnerProps {
   /** antd appends `${prefixCls}-dot` when this is the ConfigProvider indicator. */

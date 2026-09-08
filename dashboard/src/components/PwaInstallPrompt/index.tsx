@@ -116,8 +116,8 @@ export function DesktopInstallGuide({ onClose }: { onClose: () => void }) {
           <li>
             <span className={styles.guideStep}>2</span>
             <span>
-              或打开浏览器菜单，选择「{isEdge ? "应用" : "安装"} Octop」/
-              Install Octop
+              或打开浏览器菜单，选择「{isEdge ? "应用" : "安装"}威小蜜AI」/
+              Install VS Agent
             </span>
           </li>
           <li>
