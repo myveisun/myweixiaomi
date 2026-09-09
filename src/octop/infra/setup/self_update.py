@@ -23,6 +23,14 @@ _PACKAGE_NAME = "octop"
 _PYPI_URL = f"https://pypi.org/pypi/{_PACKAGE_NAME}/json"
 _GREEN_PACKAGES_ENV = "OCTOP_GREEN_PACKAGES"
 
+# 品牌（威小蜜AI / VS Agent）自有更新渠道：默认检测发布方 GitHub 仓库最新 release。
+# 可分别用 OCTOP_BRAND_VERSION（本地品牌版本号）与 OCTOP_UPDATE_URL（检测地址覆盖）调整。
+_BRAND_REPO = "myveisun/myweixiaomi"
+_BRAND_GITHUB_API = f"https://api.github.com/repos/{_BRAND_REPO}/releases/latest"
+_BRAND_VERSION_ENV = "OCTOP_BRAND_VERSION"
+_BRAND_UPDATE_URL_ENV = "OCTOP_UPDATE_URL"
+_BRAND_DEFAULT_VERSION = "1.0.0"
+
 _MIRRORS = [
     "https://mirrors.cloud.tencent.com/pypi/simple",
     "https://mirrors.aliyun.com/pypi/simple",
@@ -105,6 +113,70 @@ def get_local_version() -> str:
         return version(_PACKAGE_NAME)
     except Exception:
         return "0.0.0"
+
+
+def get_brand_version() -> str:
+    """Return the local brand version (威小蜜AI), e.g. ``1.0.0``.
+
+    Prefer ``OCTOP_BRAND_VERSION``; otherwise fall back to the underlying
+    installed Octop package version, then to a stable brand default.
+    """
+    raw = (os.environ.get(_BRAND_VERSION_ENV) or "").strip()
+    if raw:
+        return raw
+    try:
+        from importlib.metadata import version
+
+        return version(_PACKAGE_NAME)
+    except Exception:
+        return _BRAND_DEFAULT_VERSION
+
+
+@dataclass
+class BrandReleaseInfo:
+    version: str
+    body: str | None = None
+
+
+class BrandNoReleaseError(Exception):
+    """The brand repo responded 404 — no Release has been published yet.
+
+    Distinct from a connectivity failure so callers can tell "no version yet"
+    apart from "could not reach the update source".
+    """
+
+
+def fetch_latest_brand_release(timeout: int = 10) -> BrandReleaseInfo | None:
+    """Fetch the latest brand release tag + notes from the brand GitHub repo.
+
+    Honor ``OCTOP_UPDATE_URL`` as an override of the release endpoint. Raises
+    :class:`BrandNoReleaseError` when the source responds 404 (no Release yet);
+    returns None on other network or parse failures so the UI degrades gracefully.
+    """
+    url = (os.environ.get(_BRAND_UPDATE_URL_ENV) or "").strip() or _BRAND_GITHUB_API
+    try:
+        req = urllib.request.Request(
+            url,
+            headers={
+                "Accept": "application/vnd.github+json",
+                "User-Agent": "veisun-brand-updater/1.0",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            raise BrandNoReleaseError from exc
+        logger.warning("failed to fetch brand release info: %s", exc)
+        return None
+    except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError) as exc:
+        logger.warning("failed to fetch brand release info: %s", exc)
+        return None
+    tag = str(data.get("tag_name") or data.get("version") or "")
+    version = tag[1:] if tag.startswith("v") else tag
+    if not version:
+        return None
+    return BrandReleaseInfo(version=version, body=data.get("body"))
 
 
 def fetch_latest_pypi_version(timeout: int = 10) -> str | None:

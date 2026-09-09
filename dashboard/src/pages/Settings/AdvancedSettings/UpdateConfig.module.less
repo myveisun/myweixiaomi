@@ -57,6 +57,28 @@
 
 /* ── Version cards ── */
 
+.checkSource {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: var(--fn-text-tertiary);
+}
+
+.checkSourceLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--fn-color-brand);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .versionGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;

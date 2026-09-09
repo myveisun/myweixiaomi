@@ -45,7 +45,13 @@ def dashboard_cache_control(full_path: str) -> str | None:
 
 
 def _dashboard_response(path: Path, full_path: str) -> FileResponse:
-    response = FileResponse(path)
+    # Starlette guesses media types from the OS registry; on Windows ".webp"
+    # is often unregistered and falls back to application/octet-stream, which
+    # makes browsers download the asset instead of rendering it.
+    media_type = None
+    if full_path.lower().endswith(".webp"):
+        media_type = "image/webp"
+    response = FileResponse(path, media_type=media_type)
     cache_control = dashboard_cache_control(full_path)
     if cache_control is not None:
         response.headers["Cache-Control"] = cache_control

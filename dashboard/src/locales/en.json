@@ -2942,9 +2942,9 @@
     },
     "update": {
       "title": "Version & Updates",
-      "description": "Check for the latest release and upgrade in place; use the guide on the right for other install methods.",
+      "description": "View the current VS Agent version and check the latest release; in source (Editable) mode follow the guide on the right to update via git.",
       "panelTitle": "Version upgrade",
-      "panelDesc": "Check for a new release and install it when supported. Restart the service after a successful upgrade.",
+      "panelDesc": "Check whether VS Agent has a newer release. Source / Editable installs cannot in-place upgrade — use git per the guide on the right.",
       "currentVersion": "Current Version",
       "latestVersion": "Latest Version",
       "checkButton": "Check for Updates",
@@ -2957,13 +2957,15 @@
       "upgradeFailed": "Upgrade failed",
       "restartHint": "Please restart VS Agent for the update to take effect.",
       "restartCommand": "Restart command",
-      "editableHint": "Development install detected. Use git pull to update.",
-      "networkError": "Could not reach update server. Check your network.",
+      "editableHint": "Source (Editable) install detected. Use git to update the brand build per the guide.",
+      "noReleaseYet": "No release has been published yet. Publish the first Release in the brand repo to enable version checks.",
+      "couldNotReachSource": "Could not reach the update source. Check your network (GitHub must be reachable).",
+      "networkError": "Could not reach the update source. Check your network (GitHub must be reachable).",
       "notChecked": "Not checked yet",
       "stageStarting": "Starting...",
       "stageDownloading": "Downloading...",
       "stageInstalling": "Installing...",
-      "manualUpgradeHint": "You can also run: octop update --verbose",
+      "manualUpgradeHint": "You can also run: git pull origin brand/veisun",
       "restartServiceBtn": "Restart Service",
       "restarting": "Restarting...",
       "restartingHint": "This typically takes 1-2 minutes. Please wait.",
@@ -2975,38 +2977,24 @@
       "restartTimeout": "Restart timed out. Run manually: octop service restart",
       "restartFailed": "Restart request failed. Check the service and try again.",
       "releaseNotes": "Release Notes",
+      "checkSource": "Update source: brand GitHub repo myveisun/myweixiaomi.",
+      "releasesLink": "View release notes / history",
       "updateModalTitle": "New Version Available",
-      "guideTitle": "Update by install method",
-      "guideIntro": "If the one-click upgrade on the left is unavailable, pick the commands for your install method. Restart after upgrading; data stays in ~/.octop (or OCTOP_HOME).",
-      "guideDataNote": "Upgrades do not wipe local data: accounts, agents, chats and memory, skills, channels, and model settings live in the working directory. Reinstalling or updating the package keeps using that data.",
+      "guideTitle": "Update by deployment method (VS Agent brand build)",
+      "guideIntro": "VS Agent runs from source via git/uv, so in-place upgrade is unavailable. Pick the commands for your deployment. Restart after upgrading; data stays in ~/.octop (or OCTOP_HOME).",
+      "guideDataNote": "Upgrades do not wipe local data: accounts, agents, chats and memory, skills, channels, and model settings live in the working directory. Updating the brand code keeps using that data.",
       "guide": {
-        "ui": {
-          "title": "In-console upgrade",
-          "body": "Prefer Check for Updates and Upgrade Now on the left (package installs, not editable/source). In service mode you can Restart Service when done."
-        },
-        "installer": {
-          "title": "One-line installer",
-          "body": "If you used the official install script, re-run the same install command to upgrade in place (it reuses the environment and data under ~/.octop)."
+        "source": {
+          "title": "Update from source (recommended)",
+          "body": "The brand build runs from source via uv, so in-page upgrade is disabled. Pull the latest code, build the dashboard and sync dependencies:"
         },
         "cli": {
-          "title": "CLI: octop update",
-          "body": "If the octop command is on your PATH (installer or managed venv), run:"
-        },
-        "pip": {
-          "title": "pip install",
-          "body": "If you installed into your own Python environment with pip:"
-        },
-        "source": {
-          "title": "From source",
-          "body": "For git / editable installs, in-page upgrade is disabled. Pull the latest code, build the dashboard, then reinstall:"
-        },
-        "docker": {
-          "title": "Docker",
-          "body": "Rebuild and restart the image, and keep the same data volume (~/.octop or octop-data) so nothing is lost:"
+          "title": "CLI quick path",
+          "body": "One command to pull the latest brand code and update the current environment:"
         },
         "restart": {
           "title": "Restart after upgrade",
-          "body": "The new package only takes effect after the process restarts. Use the command that matches how you launched VS Agent:"
+          "body": "The updated code only takes effect after the process restarts. Use the command that matches how you launched VS Agent:"
         }
       }
     }

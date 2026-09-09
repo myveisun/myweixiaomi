@@ -8,7 +8,7 @@ from octop.api.routers import update as update_router
 from octop.api.routers import update_store
 from octop.api.routers.update_store import UpgradeTaskStatus, create_task, get_task
 from octop.infra.errors import ErrorCode, OctopError
-from octop.infra.setup.self_update import UpgradeResult
+from octop.infra.setup.self_update import BrandNoReleaseError, UpgradeResult
 
 
 @pytest.fixture(autouse=True)
@@ -19,7 +19,24 @@ def _clear_update_status_cache() -> None:
 
 
 @pytest.mark.asyncio
-async def test_update_status_reprobes_after_cache_ttl(
+async def test_check_maps_no_release_404_to_friendly_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """BrandNoReleaseError (source 404, no Release published) must NOT be reported as a
+    connectivity failure — the frontend renders a distinct 'no_release_yet' hint."""
+
+    def not_found(*_: object, **__: object) -> None:
+        raise BrandNoReleaseError
+
+    monkeypatch.setattr(update_router, "fetch_latest_brand_release", not_found)
+
+    result = await update_router.check_for_updates(_=None)
+    assert result["latest_version"] is None
+    assert result["error"] == "no_release_yet"
+
+
+@pytest.mark.asyncio
+async def test_status_reprobes_after_cache_ttl(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     builds = 0

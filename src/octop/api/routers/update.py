@@ -22,14 +22,14 @@ from octop.api.routers.update_store import (
 )
 from octop.infra.errors import ErrorCode, OctopError
 from octop.infra.setup.self_update import (
+    BrandNoReleaseError,
     UpgradeResult,
+    fetch_latest_brand_release,
     fetch_latest_pypi_version,
-    fetch_pypi_info,
+    get_brand_version,
     get_editable_path,
-    get_local_version,
     green_packages_dir,
     is_newer,
-    parse_changelog_for_version,
     run_upgrade,
 )
 from octop.infra.setup.service import (
@@ -51,9 +51,16 @@ def _build_status(
     error: str | None = None,
     release_notes: str | None = None,
 ) -> dict[str, Any]:
-    current = get_local_version()
+    current = get_brand_version()
     if latest is None and error is None:
-        latest = fetch_latest_pypi_version()
+        try:
+            release = fetch_latest_brand_release()
+        except BrandNoReleaseError:
+            release = None
+        if release is not None:
+            latest = release.version
+            if release_notes is None:
+                release_notes = release.body
     has_update = bool(latest and is_newer(latest, current))
     payload = {
         "current_version": current,
@@ -72,7 +79,7 @@ def _build_status(
 
 @router.get("/status")
 async def update_status(_: Any = Depends(current_user)) -> dict[str, Any]:
-    """Return last check result; re-probe PyPI when the server cache TTL expires."""
+    """Return last check result; re-probe the brand update channel when cached TTL expires."""
     cached = get_cached_status()
     if cached is not None:
         return cached
@@ -81,12 +88,18 @@ async def update_status(_: Any = Depends(current_user)) -> dict[str, Any]:
 
 @router.post("/check")
 async def check_for_updates(_: Any = Depends(require_permission("update"))) -> dict[str, Any]:
-    pypi_info = await asyncio.to_thread(fetch_pypi_info)
-    if pypi_info is None:
-        return await asyncio.to_thread(_build_status, latest=None, error="could not reach PyPI")
-    release_notes = parse_changelog_for_version(pypi_info.description, pypi_info.version)
+    try:
+        release = await asyncio.to_thread(fetch_latest_brand_release)
+    except BrandNoReleaseError:
+        return await asyncio.to_thread(
+            _build_status, latest=None, error="no_release_yet"
+        )
+    if release is None:
+        return await asyncio.to_thread(
+            _build_status, latest=None, error="could_not_reach_brand_update_source"
+        )
     return await asyncio.to_thread(
-        _build_status, latest=pypi_info.version, release_notes=release_notes
+        _build_status, latest=release.version, release_notes=release.body
     )
 
 

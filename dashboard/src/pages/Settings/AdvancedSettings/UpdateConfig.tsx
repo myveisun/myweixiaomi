@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Power,
   Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import {
   updateApi,
@@ -24,82 +25,42 @@ import {
 import { TabPanelHeader } from "./TabPanelHeader";
 import styles from "./UpdateConfig.module.less";
 
-/** Shell snippets shown in the manual upgrade guide (commands are locale-agnostic). */
-const UPGRADE_GUIDE_CODE = {
-  installerUnix: `curl -fsSL https://finnie-1258344699.cos.ap-guangzhou.myqcloud.com/octop/install.sh | bash`,
-  installerWin: `irm https://finnie-1258344699.cos.ap-guangzhou.myqcloud.com/octop/install.ps1 | iex`,
-  cli: `octop update
-# or non-interactive:
-octop update --yes`,
-  pip: `pip install -U octop
-# optional extras, e.g. browser automation:
-# pip install -U "octop[browser]"`,
-  source: `cd Octop
-git pull
-make build-frontend
-# or: cd dashboard && npm ci && npm run build && cd ..
-pip install -e .
-# with dev deps: make install  /  pip install -e ".[dev]"`,
-  docker: `# Compose (from repo root; rebuild + recreate)
-docker compose -f docker/docker-compose.yml up -d --build
+/** 升级指引命令 —— 面向威小蜜AI 品牌版（源码 / git / uv 运行）。 */
+/** 品牌 GitHub Releases 直链 —— 用于查看新版本说明与历史版本。 */
+const BRAND_RELEASES_URL = "https://github.com/myveisun/myweixiaomi/releases";
 
-# or rebuild the image then run with a persistent data volume
-bash docker/docker_build.sh
-docker run -d \\
-  --name octop \\
-  -p 8088:8088 \\
-  -v octop-data:/data/.octop \\
-  -e HOME=/data \\
-  octop:latest`,
-  restart: `# system service (systemd / launchd / Windows service)
+const UPGRADE_GUIDE_CODE = {
+  source: `cd Octop
+# 品牌版源码更新（本机已配好 origin/upstream，需代理时先设代理）
+git pull origin brand/veisun
+
+# 构建控制台前端并同步 Python 依赖
+make build-frontend
+uv sync
+
+# 重新启动服务（见下方「升级后重启」）`,
+  cli: `# 拉取品牌最新代码
+git fetch origin
+git pull origin brand/veisun
+make build-frontend
+uv sync
+
+# 重启服务
+octop service restart   # 系统服务模式
+# 或前台：uv run octop run`,
+  restart: `# 系统服务（systemd / launchd / Windows 服务）
 octop service restart
 
-# foreground process — stop the old process, then:
-octop run`,
+# 前台进程 —— 停掉旧进程后重新启动：
+uv run octop run`,
 } as const;
 
-type GuideMethodKey =
-  | "ui"
-  | "installer"
-  | "cli"
-  | "pip"
-  | "source"
-  | "docker"
-  | "restart";
+type GuideMethodKey = "source" | "cli" | "restart";
 
-const GUIDE_METHOD_ORDER: GuideMethodKey[] = [
-  "ui",
-  "installer",
-  "cli",
-  "pip",
-  "source",
-  "docker",
-  "restart",
-];
+const GUIDE_METHOD_ORDER: GuideMethodKey[] = ["source", "cli", "restart"];
 
 function codeFor(key: GuideMethodKey): string | null {
-  switch (key) {
-    case "installer":
-      return [
-        `# macOS / Linux`,
-        UPGRADE_GUIDE_CODE.installerUnix,
-        ``,
-        `# Windows (PowerShell)`,
-        UPGRADE_GUIDE_CODE.installerWin,
-      ].join("\n");
-    case "cli":
-      return UPGRADE_GUIDE_CODE.cli;
-    case "pip":
-      return UPGRADE_GUIDE_CODE.pip;
-    case "source":
-      return UPGRADE_GUIDE_CODE.source;
-    case "docker":
-      return UPGRADE_GUIDE_CODE.docker;
-    case "restart":
-      return UPGRADE_GUIDE_CODE.restart;
-    default:
-      return null;
-  }
+  return UPGRADE_GUIDE_CODE[key];
 }
 
 function UpgradeGuide() {
@@ -258,6 +219,17 @@ export default function UpdateConfig() {
     }
   };
 
+  const errorText = (e?: string | null) => {
+    switch (e) {
+      case "no_release_yet":
+        return t("advancedSettings.update.noReleaseYet");
+      case "could_not_reach_brand_update_source":
+        return t("advancedSettings.update.couldNotReachSource");
+      default:
+        return e;
+    }
+  };
+
   const upgradeFinished =
     progress && (progress.status === "complete" || progress.status === "error");
   const isServiceMode = !!status?.service_mode;
@@ -317,6 +289,19 @@ export default function UpdateConfig() {
             </div>
           </div>
 
+          <p className={styles.checkSource}>
+            {t("advancedSettings.update.checkSource")}
+            <a
+              className={styles.checkSourceLink}
+              href={BRAND_RELEASES_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t("advancedSettings.update.releasesLink")}
+              <ExternalLink size={12} />
+            </a>
+          </p>
+
           {status?.is_editable && (
             <div className={`${styles.alert} ${styles.alertWarn}`}>
               <AlertTriangle size={15} />
@@ -327,7 +312,19 @@ export default function UpdateConfig() {
           {status?.error && (
             <div className={`${styles.alert} ${styles.alertError}`}>
               <XCircle size={15} />
-              <span>{status.error}</span>
+              <span>
+                {errorText(status.error)}
+                <br />
+                <a
+                  className={styles.checkSourceLink}
+                  href={BRAND_RELEASES_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t("advancedSettings.update.releasesLink")}
+                  <ExternalLink size={12} />
+                </a>
+              </span>
             </div>
           )}
 

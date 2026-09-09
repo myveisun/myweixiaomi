@@ -2939,9 +2939,9 @@
     },
     "update": {
       "title": "版本与更新",
-      "description": "检查最新版本，一键升级威小蜜AI；右侧可按安装方式查看完整升级说明。",
+      "description": "查看威小蜜AI 当前版本并检测最新版本；源码（Editable）模式下请按右侧指引用 git 更新。",
       "panelTitle": "版本升级",
-      "panelDesc": "检查是否有新版本，并在支持时一键安装。更新完成后请重启服务。",
+      "panelDesc": "检测威小蜜AI 是否有新版本。源码/Editable 安装无法一键升级，请按右侧指引使用 git 更新。",
       "currentVersion": "当前版本",
       "latestVersion": "最新版本",
       "checkButton": "检查更新",
@@ -2954,13 +2954,15 @@
       "upgradeFailed": "升级失败",
       "restartHint": "请重启威小蜜AI使更新生效。",
       "restartCommand": "重启命令",
-      "editableHint": "检测到开发版安装，请使用 git pull 更新。",
-      "networkError": "无法连接更新服务器，请检查网络。",
+      "editableHint": "检测到源码（Editable）安装，请按右侧指引使用 git 更新品牌版。",
+      "noReleaseYet": "目前还没有发布任何版本，可在品牌仓库发布首个 Release 后再检测。",
+      "couldNotReachSource": "无法连接更新源，请检查网络（GitHub 需可访问）。",
+      "networkError": "无法连接更新源，请检查网络（GitHub 需可访问）。",
       "notChecked": "尚未检查",
       "stageStarting": "启动中...",
       "stageDownloading": "下载中...",
       "stageInstalling": "安装中...",
-      "manualUpgradeHint": "也可手动运行：octop update --verbose",
+      "manualUpgradeHint": "也可手动运行：git pull origin brand/veisun",
       "restartServiceBtn": "重启服务",
       "restarting": "正在重启...",
       "restartingHint": "预计需要 1-2 分钟完成，请耐心等待",
@@ -2971,39 +2973,25 @@
       "restartReadyHint": "服务已恢复，页面即将自动刷新。",
       "restartTimeout": "重启超时，请手动执行：octop service restart",
       "restartFailed": "重启请求失败，请检查服务状态后重试",
-      "releaseNotes": "更新说明",
-      "updateModalTitle": "发现新版本",
-      "guideTitle": "按安装方式更新",
-      "guideIntro": "若不能使用左侧一键升级，请按你的安装方式选择下方命令。升级后请重启服务；配置与数据默认保留在 ~/.octop（或 OCTOP_HOME）。",
-      "guideDataNote": "升级不会清空本机数据：用户账号、Agent、对话与记忆、技能、通道与模型配置等均保存在工作目录中，重新安装或更新软件本身即可继续使用。",
+      "releaseNotes":  "更新说明",
+    "checkSource":  "更新检测源：品牌 GitHub 仓库 myveisun/myweixiaomi。",
+    "releasesLink":  "前往查看新版本说明 / 历史版本",
+    "updateModalTitle":  "发现新版本",
+      "guideTitle": "按部署方式更新（威小蜜AI 品牌版）",
+      "guideIntro": "威小蜜AI 以源码/git/uv 方式运行，无法一键升级。请按你的部署方式选择下方命令更新。升级后请重启服务；配置与数据默认保留在 ~/.octop（或 OCTOP_HOME）。",
+      "guideDataNote": "升级不会清空本机数据：用户账号、Agent、对话与记忆、技能、通道与模型配置等均保存在工作目录中，更新品牌代码后即可继续使用。",
       "guide": {
-        "ui": {
-          "title": "控制台一键升级",
-          "body": "优先使用左侧「检查更新」与「立即升级」（非源码/可编辑安装）。服务模式可在完成后点「重启服务」。"
-        },
-        "installer": {
-          "title": "一键安装脚本",
-          "body": "若你是用官方安装脚本装的，重新执行同一安装命令即可自动升级到最新版（会复用 ~/.octop 下的环境与数据）。"
+        "source": {
+          "title": "源码更新（推荐）",
+          "body": "品牌版以源码/uv 方式运行，本页一键升级不可用。请在品牌仓库拉取最新代码、构建控制台前端并同步依赖："
         },
         "cli": {
-          "title": "CLI：octop update",
-          "body": "若命令行可直接使用 octop（安装脚本或 venv 布局），在终端执行："
-        },
-        "pip": {
-          "title": "pip 安装",
-          "body": "若你是用 pip 装到自己的 Python 环境，可升级包本身："
-        },
-        "source": {
-          "title": "源码安装",
-          "body": "从 Git 源码开发/editable 安装时，本页一键升级不可用。请拉取最新代码、构建控制台前端后重新安装到当前环境："
-        },
-        "docker": {
-          "title": "Docker",
-          "body": "Docker 部署请重新构建并启动镜像，并继续挂载原有数据卷（~/.octop 或 octop-data），避免丢数据："
+          "title": "CLI 快捷方式",
+          "body": "终端一键拉取最新品牌代码并更新到当前环境："
         },
         "restart": {
           "title": "升级后重启",
-          "body": "包更新完成后需要重启进程才生效。任选与你的启动方式匹配的命令："
+          "body": "代码更新完成后需要重启进程才生效。任选与你的启动方式匹配的命令："
         }
       }
     }
