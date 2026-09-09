@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>威小蜜AI · 可私有化部署的企业级多 Agent 助手平台</title>
+<style>
+  :root {
+    --brand: #2b5cff;
+    --brand-deep: #1d3fd6;
+    --ink: #0f172a;
+    --muted: #475569;
+    --line: #e2e8f0;
+    --bg: #f8fafc;
+    --bg-soft: #eef2ff;
+    --green: #16a34a;
+    --amber: #d97706;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    color: var(--ink);
+    background: #fff;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 28px; }
+  a { color: inherit; text-decoration: none; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(160deg, #0b1b4d 0%, #12307a 45%, #2b5cff 100%);
+    color: #fff;
+    padding: 84px 0 72px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: "";
+    position: absolute; right: -120px; top: -120px;
+    width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
+  }
+  .brand-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 14px; letter-spacing: 1px; color: #c7d4ff;
+    border: 1px solid rgba(255,255,255,.25); border-radius: 999px;
+    padding: 6px 14px; margin-bottom: 26px;
+  }
+  .hero h1 {
+    font-size: 44px; line-height: 1.25; font-weight: 800; letter-spacing: .5px;
+    max-width: 820px; margin-bottom: 18px;
+  }
+  .hero h1 em { font-style: normal; color: #a5c0ff; }
+  .hero .sub {
+    font-size: 18px; color: #dbe4ff; max-width: 720px; margin-bottom: 34px;
+  }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 13px 26px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; transition: transform .15s ease;
+  }
+  .btn-primary { background: #fff; color: var(--brand-deep); }
+  .btn-primary:hover { transform: translateY(-2px); }
+  .btn-ghost { border: 1px solid rgba(255,255,255,.4); color: #fff; }
+  .btn-ghost:hover { transform: translateY(-2px); }
+
+  /* 定位一句话 */
+  .positioning {
+    background: var(--bg-soft);
+    border-bottom: 1px solid var(--line);
+    padding: 34px 0;
+  }
+  .positioning p {
+    font-size: 20px; font-weight: 700; text-align: center; color: var(--brand-deep);
+  }
+
+  /* Section */
+  section { padding: 64px 0; }
+  section.alt { background: var(--bg); }
+  .kicker {
+    display: inline-block; font-size: 13px; font-weight: 700; letter-spacing: 2px;
+    color: var(--brand); text-transform: uppercase; margin-bottom: 10px;
+  }
+  h2 { font-size: 30px; font-weight: 800; margin-bottom: 14px; letter-spacing: .3px; }
+  .lead { color: var(--muted); font-size: 16px; max-width: 760px; margin-bottom: 34px; }
+
+  /* 三大优势 */
+  .advantage-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .adv-card {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px;
+    padding: 28px 26px; transition: box-shadow .2s ease, transform .2s ease;
+  }
+  .adv-card:hover { box-shadow: 0 12px 32px rgba(15,23,42,.08); transform: translateY(-4px); }
+  .adv-num { font-size: 13px; font-weight: 800; color: var(--brand); letter-spacing: 1px; }
+  .adv-card h3 { font-size: 19px; font-weight: 700; margin: 10px 0 10px; }
+  .adv-card p { color: var(--muted); font-size: 15px; }
+  .adv-card .tag {
+    display: inline-block; margin-top: 16px; font-size: 12px; font-weight: 700;
+    color: var(--green); background: #ecfdf5; border-radius: 6px; padding: 4px 10px;
+  }
+
+  /* 功能亮点 */
+  .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .feature {
+    display: flex; gap: 16px; padding: 22px; border-radius: 14px;
+    background: #fff; border: 1px solid var(--line);
+  }
+  .feature .ico { font-size: 26px; flex-shrink: 0; width: 34px; text-align: center; }
+  .feature h4 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .feature p { color: var(--muted); font-size: 14px; }
+
+  /* 竞品对比 */
+  table.cmp { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; }
+  table.cmp th, table.cmp td {
+    padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--line);
+  }
+  table.cmp thead th { background: #f1f5f9; font-weight: 700; }
+  table.cmp td:first-child { font-weight: 600; }
+  .yes { color: var(--green); font-weight: 700; }
+  .partial { color: var(--amber); font-weight: 700; }
+  .no { color: #94a3b8; }
+  .ours { background: #eef2ff; }
+  .ours td:first-child { color: var(--brand-deep); }
+
+  /* 目标客户 */
+  .icp-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .icp {
+    background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 22px;
+  }
+  .icp .rank { font-size: 13px; font-weight: 800; color: #fff; background: var(--brand); border-radius: 6px; padding: 2px 8px; }
+  .icp h4 { font-size: 16px; font-weight: 700; margin: 12px 0 8px; }
+  .icp p { color: var(--muted); font-size: 14px; }
+
+  /* 定价 */
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+  .price {
+    background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 28px 24px;
+    display: flex; flex-direction: column; position: relative;
+  }
+  .price.reco { border: 2px solid var(--brand); box-shadow: 0 12px 32px rgba(43,92,255,.14); }
+  .price .badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--brand); color: #fff; font-size: 12px; font-weight: 700;
+    padding: 4px 14px; border-radius: 999px; white-space: nowrap;
+  }
+  .price .name { font-size: 16px; font-weight: 700; }
+  .price .amount { font-size: 32px; font-weight: 800; margin: 14px 0 4px; }
+  .price .amount small { font-size: 14px; font-weight: 500; color: var(--muted); }
+  .price .desc { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+  .price ul { list-style: none; flex: 1; }
+  .price li { font-size: 14px; padding: 6px 0; color: var(--muted); }
+  .price li::before { content: "✓ "; color: var(--green); font-weight: 700; }
+  .price .btn { text-align: center; margin-top: 20px; width: 100%; }
+  .price.reco .btn { background: var(--brand); color: #fff; }
+  .price .btn-outline { border: 1px solid var(--line); color: var(--ink); }
+
+  /* 销售话术 */
+  .script { border-left: 3px solid var(--brand); background: #fff; border-radius: 0 12px 12px 0; padding: 18px 22px; margin-bottom: 16px; }
+  .script .who { font-weight: 700; color: var(--brand-deep); font-size: 15px; margin-bottom: 6px; }
+  .script p { color: var(--muted); font-size: 14px; }
+
+  /* CTA footer */
+  .cta-final {
+    background: linear-gradient(160deg, #0b1b4d, #2b5cff);
+    color: #fff; padding: 64px 0; text-align: center;
+  }
+  .cta-final h2 { color: #fff; }
+  .cta-final p { color: #dbe4ff; margin-bottom: 28px; }
+  .footer {
+    background: #0b1b4d; color: #94a3b8; font-size: 13px; padding: 26px 0; text-align: center;
+  }
+  .footer b { color: #c7d4ff; }
+
+  @media (max-width: 768px) {
+    .hero h1 { font-size: 32px; }
+    .advantage-grid, .icp-list, .price-grid { grid-template-columns: 1fr; }
+    .feature-grid { grid-template-columns: 1fr; }
+    table.cmp { font-size: 12px; }
+    table.cmp th, table.cmp td { padding: 10px 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="wrap">
+    <span class="brand-badge">威尚网络 · VeiSun Networks</span>
+    <h1>威小蜜AI<br />把 AI 助手<em>部署进你自己的机房</em>，数据不出企业</h1>
+    <p class="sub">一套可私有化部署的企业级多 Agent 助手平台。接任意大模型、进企业微信/飞书/钉钉、多用户多角色、专家与技能自由组合——对话、知识、自动化、代码与浏览器操控，一个进程全搞定。</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="https://www.veisun.net">预约 15 分钟演示</a>
+      <a class="btn btn-ghost" href="https://www.veisun.net">获取私有化部署方案</a>
+    </div>
+  </div>
+</div>
+
+<!-- 定位一句话 -->
+<div class="positioning">
+  <div class="wrap">
+    <p>可私有化部署的企业级多 Agent 助手平台 —— 数据主权在你手里，模型随你选，助手走进你现有的协作流。</p>
+  </div>
+</div>
+
+<!-- 三大优势 -->
+<section>
+  <div class="wrap">
+    <span class="kicker">为什么选威小蜜AI</span>
+    <h2>三个大厂给不了的结构性优势</h2>
+    <p class="lead">市面上的 AI 办公产品要么数据上云、要么强制绑定单一模型和账号。威小蜜AI 选择站在对面——把控制权完整交还给你。</p>
+    <div class="advantage-grid">
+      <div class="adv-card">
+        <div class="adv-num">优势 01</div>
+        <h3>数据主权 + 私有化部署</h3>
+        <p>可部署到企业内网、私有云或自有服务器，对话、知识库、工作区、凭证全部留在自己机器上。对政企、金融、医疗、教育等数据敏感行业，这不是加分项，是准入红线。</p>
+        <span class="tag">别人最难复制</span>
+      </div>
+      <div class="adv-card">
+        <div class="adv-num">优势 02</div>
+        <h3>多模型不锁定，成本可控</h3>
+        <p>DeepSeek、豆包、GPT、本地 Ollama 等任意模型随意接、随时换。代码开源可审计、可二次开发。客户自己决定用什么模型、花多少钱，不被单一供应商绑死。</p>
+        <span class="tag">有退路的选择</span>
+      </div>
+      <div class="adv-card">
+        <div class="adv-num">优势 03</div>
+        <h3>IM 网关原生落地</h3>
+        <p>把 AI 助手带进企业已经在用的飞书、企业微信、钉钉、QQ、Discord、Telegram，而不是逼员工再装一个新 App。潜入现有协作流，落地阻力最小。</p>
+        <span class="tag">独特的切入路径</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 功能亮点 -->
+<section class="alt">
+  <div class="wrap">
+    <span class="kicker">功能全景</span>
+    <h2>一个进程，覆盖从对话到自动化的完整能力</h2>
+    <p class="lead">无需外部队列、无需额外服务。装好即用，重启即恢复。</p>
+    <div class="feature-grid">
+      <div class="feature"><span class="ico">👥</span><div><h4>多用户多 Agent</h4><p>一个管理员管理整个团队，每个用户拥有专属 Agent 团队，按任务切换专家，JWT 隔离互不干扰。</p></div></div>
+      <div class="feature"><span class="ico">🎭</span><div><h4>专家库 + MBTI 人设</h4><p>内置专家库开箱即用，16 种人格模板 + 互动测试，给每个 Agent 一个鲜明性格。</p></div></div>
+      <div class="feature"><span class="ico">🔌</span><div><h4>连接器生态</h4><p>OAuth 应用 + MCP 网关，接入腾讯文档、微博热搜、新闻等外部资源，能力边界可无限扩展。</p></div></div>
+      <div class="feature"><span class="ico">📚</span><div><h4>知识库 + 可迁移记忆</h4><p>本地知识库检索，分层记忆随工作区迁移，Agent 越用越懂你。</p></div></div>
+      <div class="feature"><span class="ico">⏰</span><div><h4>定时自动化</h4><p>自然语言 + 斜杠命令触发的主动式 cron 任务，让 Agent 定时主动汇报、执行。</p></div></div>
+      <div class="feature"><span class="ico">💻</span><div><h4>终端 AI + 浏览器 AI</h4><p>浏览器内交互式终端、无头 Chromium 网页自动化、截图与远程浏览。</p></div></div>
+      <div class="feature"><span class="ico">🖥️</span><div><h4>远程桌面 / 远程安卓</h4><p>从仪表盘实时查看与操控 Linux / Windows / macOS 桌面，支持远程办公与 GUI 应用。</p></div></div>
+      <div class="feature"><span class="ico">↔️</span><div><h4>ACP 双向集成</h4><p>既能让外部 IDE 工具调用你的 Agent，也能让 Agent 委托 OpenCode、Claude Code、Codex 等编码智能体。</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 竞品对比 -->
+<section>
+  <div class="wrap">
+    <span class="kicker">差异化定位</span>
+    <h2>他们挤在云托管个人效率，你独占企业私有化</h2>
+    <p class="lead">Codex、Trae Work、WorkBuddy 都是闭源、云托管、绑定自家模型的个人/团队效率工具。威小蜜AI 是唯一落在「自托管 + 企业平台」象限的选择。</p>
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th>能力维度</th>
+          <th>威小蜜AI</th>
+          <th>Codex</th>
+          <th>Trae Work</th>
+          <th>WorkBuddy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="ours">
+          <td>私有化 / 自托管部署</td>
+          <td class="yes">完整支持</td>
+          <td class="no">不支持</td>
+          <td class="no">不支持</td>
+          <td class="no">不支持</td>
+        </tr>
+        <tr class="ours">
+          <td>多模型自由切换</td>
+          <td class="yes">完整支持</td>
+          <td class="no">绑定 OpenAI</td>
+          <td class="no">绑定豆包</td>
+          <td class="no">绑定腾讯</td>
+        </tr>
+        <tr class="ours">
+          <td>企业 IM（飞书/企微/钉钉）落地</td>
+          <td class="yes">完整支持</td>
+          <td class="no">不支持</td>
+          <td class="no">不支持</td>
+          <td class="no">不支持</td>
+        </tr>
+        <tr>
+          <td>开源可审计</td>
+          <td class="yes">完整支持</td>
+          <td class="no">不支持</td>
+          <td class="no">不支持</td>
+          <td class="no">不支持</td>
+        </tr>
+        <tr>
+          <td>多用户多角色管理</td>
+          <td class="yes">完整支持</td>
+          <td class="partial">部分支持</td>
+          <td class="partial">部分支持</td>
+          <td class="partial">部分支持</td>
+        </tr>
+        <tr>
+          <td>模型能力 / AGI 上限</td>
+          <td class="partial">取决于所接模型</td>
+          <td class="yes">顶级</td>
+          <td class="yes">顶级</td>
+          <td class="yes">顶级</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="lead" style="margin-top:20px;font-size:14px;">诚实地说：在模型底层能力、UI 打磨、品牌流量上，你拼不过大厂。所以威小蜜AI 的策略是<strong style="color:var(--brand-deep)">绕开而非对抗</strong>——把「数据主权 + 私有化 + 多模型自由 + IM 落地」做到他们做不了的位置。</p>
+  </div>
+</section>
+
+<!-- 目标客户 -->
+<section class="alt">
+  <div class="wrap">
+    <span class="kicker">目标客户</span>
+    <h2>先打这三个最容易成交的人群</h2>
+    <p class="lead">按付费意愿与决策阻力排序，从最痛、最刚需的人群切入。</p>
+    <div class="icp-list">
+      <div class="icp">
+        <span class="rank">优先级 1</span>
+        <h4>数据敏感行业</h4>
+        <p>政企、金融、医疗、教育。数据不能出企业的硬约束，让私有化从"选项"变成"唯一解"——这是你的主场。</p>
+      </div>
+      <div class="icp">
+        <span class="rank">优先级 2</span>
+        <h4>嫌大厂私有化贵的团队</h4>
+        <p>已有私有化需求，但觉得 Dify 或大厂私有化定制太贵、排期太长。你开源、便宜、交付快。</p>
+      </div>
+      <div class="icp">
+        <span class="rank">优先级 3</span>
+        <h4>想用 IM 落地 AI 的团队</h4>
+        <p>想在企业微信/飞书里直接用 AI，但不想把数据上云。你的 IM 网关是现成的切入理由。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 定价 -->
+<section>
+  <div class="wrap">
+    <span class="kicker">商业化路径</span>
+    <h2>开源免费 + 商业授权，分层接住两端客户</h2>
+    <p class="lead">个人极客和企业预算的付费意愿差异极大，分层定价才能同时接住。企业版不在线上标价，引导联系销售。</p>
+    <div class="price-grid">
+      <div class="price">
+        <div class="name">社区版</div>
+        <div class="amount">¥0</div>
+        <div class="desc">面向个人开发者、极客、学习场景</div>
+        <ul>
+          <li>单用户、基础模型接入</li>
+          <li>Web 仪表盘 + CLI</li>
+          <li>社区支持</li>
+        </ul>
+        <a class="btn btn-outline" href="https://www.veisun.net">免费开始</a>
+      </div>
+      <div class="price reco">
+        <span class="badge">最受欢迎</span>
+        <div class="name">专业版</div>
+        <div class="amount">¥199<small> / 月起</small></div>
+        <div class="desc">面向中小团队，完整生产能力</div>
+        <ul>
+          <li>多用户多 Agent 并发</li>
+          <li>知识库 + 可迁移记忆完整版</li>
+          <li>企业 IM 网关接入</li>
+          <li>定时自动化 + 终端/浏览器 AI</li>
+        </ul>
+        <a class="btn" href="https://www.veisun.net">预约演示</a>
+      </div>
+      <div class="price">
+        <div class="name">企业版</div>
+        <div class="amount">联系销售</div>
+        <div class="desc">面向数据敏感行业、大规模部署</div>
+        <ul>
+          <li>多租户 + SSO 单点登录</li>
+          <li>审计日志 + 合规资质</li>
+          <li>私有模型接入 + SLA 保障</li>
+          <li>专属交付 + 定制开发</li>
+        </ul>
+        <a class="btn btn-outline" href="https://www.veisun.net">联系销售</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 销售话术 -->
+<section class="alt">
+  <div class="wrap">
+    <span class="kicker">销售弹药</span>
+    <h2>面对不同角色，怎么开口</h2>
+    <p class="lead">同一套产品，对不同决策角色说不同的话。</p>
+    <div class="script">
+      <div class="who">对发起者（业务骨干 / 项目经理）</div>
+      <p>"不用再在 5 个群里来回发文件、查资料了——把 AI 助手直接放进你们在用的企业微信里，每天那件重复的事，交给它自动完成。"</p>
+    </div>
+    <div class="script">
+      <div class="who">对评估者（技术负责人 / 部门主管）</div>
+      <p>"开源自托管，数据不离开内网；接任意模型，成本你们自己控制。有架构文档、API 说明，我这边可以先出一个 2 周试点方案给你向老板汇报。"</p>
+    </div>
+    <div class="script">
+      <div class="who">对决策者（CXO / 预算审批人）</div>
+      <p>"这笔投入买的是数据主权和供应商自主权——不依赖任何单一模型厂商，团队能长期复用同一套 AI 能力，而不是每年被订阅费锁死。"</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-final">
+  <div class="wrap">
+    <h2>把 AI 助手，部署进你自己的机房</h2>
+    <p>预约一次 15 分钟演示，看看威小蜜AI 怎么在你的环境里跑起来。</p>
+    <div class="cta-row" style="justify-content:center;">
+      <a class="btn btn-primary" href="https://www.veisun.net">预约演示</a>
+      <a class="btn btn-ghost" href="https://www.veisun.net">联系销售</a>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="wrap">
+    <b>威小蜜AI · VS Agent</b> · 威尚网络 / VeiSun Networks · <a href="https://www.veisun.net">https://www.veisun.net</a>
+  </div>
+</div>
+
+</body>
+</html>
