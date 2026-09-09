@@ -29,6 +29,7 @@ _BRAND_REPO = "myveisun/myweixiaomi"
 _BRAND_GITHUB_API = f"https://api.github.com/repos/{_BRAND_REPO}/releases/latest"
 _BRAND_VERSION_ENV = "OCTOP_BRAND_VERSION"
 _BRAND_UPDATE_URL_ENV = "OCTOP_UPDATE_URL"
+_BRAND_UPDATE_PROXY_ENV = "OCTOP_UPDATE_PROXY"
 _BRAND_DEFAULT_VERSION = "1.0.0"
 
 _MIRRORS = [
@@ -146,6 +147,25 @@ class BrandNoReleaseError(Exception):
     """
 
 
+def _update_opener_factories() -> list[callable]:
+    """Ordered opener factories for the brand update source.
+
+    本机系统代理（注册表里的本地代理/VPN 加速）访问 api.github.com 时经常
+    返回 HTTP 403 rate limit exceeded，而直连往往可用。因此依次尝试：
+    直连 → OCTOP_UPDATE_PROXY 显式代理 → 系统默认代理，保证任意网络都能
+    尽量拿到更新信息。
+    """
+    factories: list[callable] = [
+        lambda: urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    ]
+    proxy = (os.environ.get(_BRAND_UPDATE_PROXY_ENV) or "").strip()
+    if proxy:
+        handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+        factories.insert(1, lambda: urllib.request.build_opener(handler))
+    factories.append(urllib.request.build_opener)
+    return factories
+
+
 def fetch_latest_brand_release(timeout: int = 10) -> BrandReleaseInfo | None:
     """Fetch the latest brand release tag + notes from the brand GitHub repo.
 
@@ -154,23 +174,28 @@ def fetch_latest_brand_release(timeout: int = 10) -> BrandReleaseInfo | None:
     returns None on other network or parse failures so the UI degrades gracefully.
     """
     url = (os.environ.get(_BRAND_UPDATE_URL_ENV) or "").strip() or _BRAND_GITHUB_API
-    try:
-        req = urllib.request.Request(
-            url,
-            headers={
-                "Accept": "application/vnd.github+json",
-                "User-Agent": "veisun-brand-updater/1.0",
-            },
-        )
-        with urllib.request.urlopen(req, timeout=timeout) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as exc:
-        if exc.code == 404:
-            raise BrandNoReleaseError from exc
-        logger.warning("failed to fetch brand release info: %s", exc)
-        return None
-    except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError) as exc:
-        logger.warning("failed to fetch brand release info: %s", exc)
+    req = urllib.request.Request(
+        url,
+        headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "veisun-brand-updater/1.0",
+        },
+    )
+    last_error: Exception | None = None
+    for factory in _update_opener_factories():
+        try:
+            with factory().open(req, timeout=timeout) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code == 404:
+                raise BrandNoReleaseError from exc
+            last_error = exc
+            exc.close()
+        except (urllib.error.URLError, TimeoutError, KeyError, json.JSONDecodeError) as exc:
+            last_error = exc
+    else:
+        logger.warning("failed to fetch brand release info: %s", last_error)
         return None
     tag = str(data.get("tag_name") or data.get("version") or "")
     version = tag[1:] if tag.startswith("v") else tag
