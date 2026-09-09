@@ -244,18 +244,18 @@ func formatHealthWaitError(locale Locale, base string, timeout time.Duration, la
 	switch {
 	case lastStatus >= 500:
 		return fmt.Errorf("%s", desktopText(locale,
-			fmt.Sprintf("Octop 服务未在%s内就绪（%s）。服务已响应但尚未就绪，请稍后再试，或查看终端日志。", wait, addr),
-			fmt.Sprintf("Octop did not become ready within %s (%s). The service responded but is not ready yet. Try again, or check the terminal logs.", wait, addr),
+			fmt.Sprintf("威小蜜AI 服务未在%s内就绪（%s）。服务已响应但尚未就绪，请稍后再试，或查看终端日志。", wait, addr),
+			fmt.Sprintf("VS Agent did not become ready within %s (%s). The service responded but is not ready yet. Try again, or check the terminal logs.", wait, addr),
 		))
 	case lastErr != nil:
 		return fmt.Errorf("%s", desktopText(locale,
-			fmt.Sprintf("Octop 服务未在%s内就绪（%s）。目前无法连接该地址，请确认 Octop 正在运行。", wait, addr),
-			fmt.Sprintf("Octop did not become ready within %s (%s). Could not connect — make sure Octop is running.", wait, addr),
+			fmt.Sprintf("威小蜜AI 服务未在%s内就绪（%s）。目前无法连接该地址，请确认威小蜜AI 正在运行。", wait, addr),
+			fmt.Sprintf("VS Agent did not become ready within %s (%s). Could not connect — make sure VS Agent is running.", wait, addr),
 		))
 	default:
 		return fmt.Errorf("%s", desktopText(locale,
-			fmt.Sprintf("Octop 服务未在%s内就绪（%s）。请确认本机已启动 Octop，且地址、端口正确；也可查看终端日志。", wait, addr),
-			fmt.Sprintf("Octop did not become ready within %s (%s). Make sure Octop is running at this address, or check the terminal logs.", wait, addr),
+			fmt.Sprintf("威小蜜AI 服务未在%s内就绪（%s）。请确认本机已启动威小蜜AI，且地址、端口正确；也可查看终端日志。", wait, addr),
+			fmt.Sprintf("VS Agent did not become ready within %s (%s). Make sure VS Agent is running at this address, or check the terminal logs.", wait, addr),
 		))
 	}
 }

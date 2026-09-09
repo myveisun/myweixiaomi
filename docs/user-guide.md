@@ -1,4 +1,4 @@
-# Octop 用户帮助文档
+# 威小蜜AI 用户帮助文档
 
 > 本帮助文档面向最终用户，介绍 **安装 → 设置向导 → 配置模型 → 基本使用** 的完整流程。
 > 所有运行时数据默认存放在 `~/.octop/`（可通过 `OCTOP_HOME` 覆盖）。
@@ -8,7 +8,7 @@
 ## 目录
 
 - [一、简介](#一简介)
-- [二、安装 Octop](#二安装-octop)
+- [二、安装威小蜜AI](#二安装威小蜜ai)
   - [2.1 环境要求](#21-环境要求)
   - [2.2 一键脚本安装（推荐）](#22-一键脚本安装推荐)
   - [2.3 验证安装](#23-验证安装)
@@ -43,9 +43,9 @@
 
 ## 一、简介
 
-**Octop** 是一个开源、自托管的 AI 助手平台，支持多用户、多 Agent。它在单进程中同时提供 Web 控制台、CLI、IM 通道（飞书、钉钉、QQ、Discord、企业微信等）和定时任务，所有数据都保存在你自己的机器上。
+**威小蜜AI** 是一个开源、自托管的 AI 助手平台，支持多用户、多 Agent。它在单进程中同时提供 Web 控制台、CLI、IM 通道（飞书、钉钉、QQ、Discord、企业微信等）和定时任务，所有数据都保存在你自己的机器上。
 
-![图 1.1 — Octop 产品总览](assets/overview.png)
+![图 1.1 — 威小蜜AI 产品总览](assets/overview.png)
 
 核心特性速览：
 
@@ -58,7 +58,7 @@
 
 ---
 
-## 二、安装 Octop
+## 二、安装威小蜜AI
 
 ### 2.1 环境要求
 
@@ -220,7 +220,7 @@ octop run
 
 ## 四、配置模型（LLM 供应商）
 
-Octop 通过 **供应商（Provider）** 接入大模型。每个 Agent 可使用不同的供应商与模型。支持 OpenAI 兼容 API、Anthropic、AWS Bedrock、DashScope（通义千问）、Ollama 本地模型等。
+威小蜜AI 通过 **供应商（Provider）** 接入大模型。每个 Agent 可使用不同的供应商与模型。支持 OpenAI 兼容 API、Anthropic、AWS Bedrock、DashScope（通义千问）、Ollama 本地模型等。
 
 ### 4.1 预设供应商
 
@@ -349,9 +349,9 @@ octop provider --help     # 供应商增删改查帮助
 
 ### 5.7 ACP（与 IDE / 编码 Agent 协作）
 
-Octop 支持两个方向的 ACP 集成：
+威小蜜AI 支持两个方向的 ACP 集成：
 
-1. **入站** —— 让外部工具（Zed、OpenCode 等）使用你的 Octop Agent：
+1. **入站** —— 让外部工具（Zed、OpenCode 等）使用你的威小蜜AI Agent：
 
    ```bash
    octop acp --agent main
@@ -392,7 +392,7 @@ Octop 支持两个方向的 ACP 集成：
 
 | 命令 | 说明 |
 |------|------|
-| `octop run` | 前台启动 Octop |
+| `octop run` | 前台启动威小蜜AI |
 | `octop run --host 0.0.0.0 --port 8088` | 自定义监听地址与端口 |
 | `octop service start` | 安装并启动系统服务 |
 | `octop service stop` | 停止系统服务 |
@@ -460,7 +460,7 @@ Octop 支持两个方向的 ACP 集成：
 
 | 编号 | 位置 | 文件名 | 状态 | 内容说明 |
 |------|------|--------|------|----------|
-| 图 1.1 | 一、简介 | `overview.png` | ✅ 已就位 | Octop 品牌 Banner |
+| 图 1.1 | 一、简介 | `overview.png` | ✅ 已就位 | 威小蜜AI 品牌 Banner |
 | 图 3.1 | 3.2 向导步骤 | `setup-01-steps.png` | ✅ 已就位 | 向导步骤条（验证密码页） |
 | 图 3.2 | 3.2 管理员 | `setup-02-admin.png` | ✅ 已就位 | 创建管理员账号表单 |
 | 图 3.3 | 3.2 模型 | `setup-03-model.png` | ✅ 已就位 | 向导内预设供应商选择 |

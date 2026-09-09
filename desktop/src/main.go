@@ -162,7 +162,7 @@ func (a *App) boot() {
 		locale = a.store.get().Locale
 	}
 	if url := os.Getenv("OCTOP_DESKTOP_URL"); url != "" {
-		a.setStatus(desktopText(locale, "正在连接 Octop…", "Connecting to Octop…"))
+		a.setStatus(desktopText(locale, "正在连接威小蜜AI…", "Connecting to VS Agent…"))
 		if err := waitHealth(locale, url, 60*time.Second); err != nil {
 			a.setStatus(err.Error())
 			return
@@ -187,7 +187,7 @@ func (a *App) boot() {
 		return
 	}
 	base := dashboardURL(s.Port)
-	a.setStatus(desktopText(locale, "正在启动 Octop 服务…", "Starting the Octop service…"))
+	a.setStatus(desktopText(locale, "正在启动威小蜜AI 服务…", "Starting the VS Agent service…"))
 	if err := waitHealth(locale, base, 2*time.Minute); err != nil {
 		a.setStatus(err.Error())
 		return
@@ -206,7 +206,7 @@ func (a *App) showDashboard(base string) {
 		time.Sleep(800 * time.Millisecond)
 		a.applyDashboardPrefs(s)
 	}()
-	a.setStatus(desktopText(s.Locale, "Octop 已就绪", "Octop is ready"))
+	a.setStatus(desktopText(s.Locale, "威小蜜AI 已就绪", "VS Agent is ready"))
 }
 
 func (a *App) hideToTray() {
@@ -294,8 +294,8 @@ func main() {
 	}
 
 	app := application.New(application.Options{
-		Name:        "Octop",
-		Description: "Octop desktop",
+		Name:        "VS Agent",
+		Description: "VS Agent desktop",
 		Services: []application.Service{
 			application.NewService(api),
 		},
@@ -319,7 +319,7 @@ func main() {
 	})
 
 	win := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:                "Octop",
+		Title:                "威小蜜AI",
 		Width:                1200,
 		Height:               800,
 		URL:                  "/",
@@ -342,7 +342,7 @@ func main() {
 	win.OnWindowEvent(events.Windows.WebViewNavigationCompleted, installDragOverlay)
 	win.OnWindowEvent(events.Linux.WindowLoadFinished, installDragOverlay)
 	settingsWin := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title:            "Octop 设置",
+		Title:            "威小蜜AI 设置",
 		Width:            settingsWindowWidth,
 		Height:           settingsWindowOuterHeight(),
 		URL:              "/?settings=1",
@@ -386,7 +386,7 @@ func main() {
 
 	tray := app.SystemTray.New()
 	applyTrayIcon(tray)
-	tray.SetTooltip("Octop")
+	tray.SetTooltip("威小蜜AI")
 	tray.AttachWindow(settingsWin).WindowOffset(6)
 	showSettings := func() { tray.ShowWindow() }
 	if trayLeftClickShowsSettings(runtime.GOOS) {

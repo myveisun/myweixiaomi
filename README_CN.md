@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-banner-zh.png" alt="Octop Banner" width="600" />
+  <img src="docs/assets/readme-banner-zh.png" alt="威小蜜AI Banner" width="600" />
 </p>
 
 <p align="center">
@@ -34,11 +34,11 @@
 
 ## 📌 概述
 
-**Octop** 是一个开源、自托管的 AI 助手。它不仅是工具，更是可并行运作的数字生命体。通过多 Agent 架构，它为团队、家庭和个人构建了既独立又协作的智能环境。并且这一切都运行在你的机器上——完全自托管的设计让隐私不再是妥协，而单进程启动的便捷性，则让强大的 Web 控制台、CLI 与 IM 集成触手可及。
+**威小蜜AI** 是一个开源、自托管的 AI 助手。它不仅是工具，更是可并行运作的数字生命体。通过多 Agent 架构，它为团队、家庭和个人构建了既独立又协作的智能环境。并且这一切都运行在你的机器上——完全自托管的设计让隐私不再是妥协，而单进程启动的便捷性，则让强大的 Web 控制台、CLI 与 IM 集成触手可及。
 
 借助飞书、钉钉、QQ、Discord、企业微信或 HTTP/SSE API 与任意 Agent 对话；通过**专家库**一键创建专业角色，通过 **Connector**（OAuth + MCP）接入外部服务，通过 **ACP** 与 IDE / 终端 AI 工具双向协作。
 
-> Octop 的设计目标：让每一次对话、工作区与凭据都留在你自己的机器上，同时为每个用户配备一组可按场景切换的专业 Agent。
+> 威小蜜AI 的设计目标：让每一次对话、工作区与凭据都留在你自己的机器上，同时为每个用户配备一组可按场景切换的专业 Agent。
 
 ## ✨ 亮点
 
@@ -57,7 +57,7 @@
 | 🏠 | **可自托管** | 一条 `octop run` 即可运行控制台、CLI、IM 通道与定时任务，数据存于 `~/.octop/` |
 
 <details>
-<summary>🐾 你能用 Octop 做什么</summary>
+<summary>🐾 你能用威小蜜AI 做什么</summary>
 
 - **个人助理** — 让专属 Agent 帮你写周报、整理资料、定日程，记忆随工作区长期保留。
 - **家庭共享** — 一个管理员账号，全家共用；按成员分配不同 Agent 与专家角色。
@@ -84,14 +84,14 @@
 | **ACP** | agent-client-protocol |
 | **构建 / 质量** | hatchling · ruff · mypy · pytest |
 
-Octop 基于一系列 Harness 工程实践构建——它将这些专注的运行时组合进同一个进程：
+威小蜜AI 基于一系列 Harness 工程实践构建——它将这些专注的运行时组合进同一个进程：
 
 - **harness-agent** — Agent 运行时：模型路由、工具、技能与对话检查点。
 - **harness-gateway** — 多平台 IM 通道桥接，将各类入站消息归一为统一的处理管线。
 - **harness-memory** — 分层记忆与全文检索，让 Agent 的记忆随工作区一同迁移。
 - **harness-browser** — 基于 CDP 的浏览器自动化，支持持久化配置，用于网页类任务。
 
-Octop 不依赖外部消息队列或中间件，而是通过进程内的 `HarnessProcessor` 统一路由所有入口——Web UI、IM 与定时任务。最终呈现为一个可重启恢复的单进程：启动时整个状态都从控制面数据库重建（默认 `~/.octop/octop.db`，亦可配置 PostgreSQL）。
+威小蜜AI 不依赖外部消息队列或中间件，而是通过进程内的 `HarnessProcessor` 统一路由所有入口——Web UI、IM 与定时任务。最终呈现为一个可重启恢复的单进程：启动时整个状态都从控制面数据库重建（默认 `~/.octop/octop.db`，亦可配置 PostgreSQL）。
 
 ## 🤔 功能特性
 
@@ -118,14 +118,14 @@ Octop 不依赖外部消息队列或中间件，而是通过进程内的 `Harnes
 
 ### ACP（Agent Client Protocol）
 
-Octop 支持两个方向的 ACP 集成：
+威小蜜AI 支持两个方向的 ACP 集成：
 
-1. **入站** — 外部工具使用**你的** Octop Agent
+1. **入站** — 外部工具使用**你的** 威小蜜AI Agent
    ```bash
    octop acp --agent main   # 为 Zed、OpenCode 等提供 stdio ACP 服务
    ```
 
-2. **出站** — Octop 委派给外部编程 Agent
+2. **出站** — 威小蜜AI 委派给外部编程 Agent
    - 控制台 → **ACP**（`/acp`）：配置 Runner（按用户全局）
    - 为 Agent 启用 **acp_runner** 后，在对话中委派任务
 
@@ -348,7 +348,7 @@ OpenAI 兼容 API、DashScope（千问）、Ollama 等预设 — 在控制台或
 | 命令 | 说明 |
 |------|------|
 | `octop init` | 初始化 `~/.octop/`（数据库、管理员、JWT 密钥） |
-| `octop run` | 前台启动 Octop |
+| `octop run` | 前台启动威小蜜AI |
 | `octop service start` | 安装并启动系统服务 |
 | `octop service stop` | 停止系统服务 |
 | `octop agent` | 创建、列出、启停 Agent |
@@ -369,7 +369,7 @@ OpenAI 兼容 API、DashScope（千问）、Ollama 等预设 — 在控制台或
 `octop run` 启动后访问 **http://127.0.0.1:8088**。
 
 <p align="center">
-  <img src="docs/assets/readme-chat-zh.png" alt="Octop Web 控制台" width="800" />
+  <img src="docs/assets/readme-chat-zh.png" alt="威小蜜AI Web 控制台" width="800" />
 </p>
 
 - **对话** — 与 Agent 实时聊天

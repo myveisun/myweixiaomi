@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/readme-banner.png" alt="Octop Banner" width="600" />
+  <img src="docs/assets/readme-banner.png" alt="VS Agent Banner" width="600" />
 </p>
 
 <p align="center">
@@ -33,7 +33,7 @@
 
 ---
 
-**Octop** is an open-source, self-hosted AI assistant. It's not just a tool — it's a digital life form that can operate in parallel. Through its multi-agent architecture, it builds an intelligent environment that is both independent and collaborative for teams, families, and individuals. Best of all, it runs entirely on your machine — the fully self-hosted design means privacy is never a compromise, while single-process startup makes the powerful web console, CLI, and IM integrations readily accessible.
+**VS Agent** is an open-source, self-hosted AI assistant. It's not just a tool — it's a digital life form that can operate in parallel. Through its multi-agent architecture, it builds an intelligent environment that is both independent and collaborative for teams, families, and individuals. Best of all, it runs entirely on your machine — the fully self-hosted design means privacy is never a compromise, while single-process startup makes the powerful web console, CLI, and IM integrations readily accessible.
 
 Chat through the Web Dashboard, Feishu, DingTalk, QQ, Discord, WeCom, or programmatic HTTP/SSE. Extend capabilities with the **expert library**, **Connectors** (OAuth + MCP), and **ACP** integration for IDE workflows.
 
@@ -55,9 +55,9 @@ Chat through the Web Dashboard, Feishu, DingTalk, QQ, Discord, WeCom, or program
 
 ## 📌 Overview
 
-Octop is a self-hosted AI assistant platform for households and small teams. It runs a single process that serves a web dashboard, a CLI, IM channels (Feishu, DingTalk, QQ, Discord, WeCom, and more), and cron automation — all sharing one SQLite database under `~/.octop/`.
+VS Agent is a self-hosted AI assistant platform for households and small teams. It runs a single process that serves a web dashboard, a CLI, IM channels (Feishu, DingTalk, QQ, Discord, WeCom, and more), and cron automation — all sharing one SQLite database under `~/.octop/`.
 
-> Octop's design goal: keep every conversation, workspace, and credential on your own machine, while giving each user a personal team of specialized agents they can switch between per task.
+> VS Agent's design goal: keep every conversation, workspace, and credential on your own machine, while giving each user a personal team of specialized agents they can switch between per task.
 
 ## 🧠 Core Technology
 
@@ -73,14 +73,14 @@ Octop is a self-hosted AI assistant platform for households and small teams. It 
 | **ACP** | agent-client-protocol |
 | **Build / quality** | hatchling · ruff · mypy · pytest |
 
-Octop is built on the Harness stack — a set of focused runtimes that Octop composes into one process:
+VS Agent is built on the Harness stack — a set of focused runtimes that VS Agent composes into one process:
 
 - **harness-agent** — Agent runtime: model routing, tools, skills, and conversation checkpointing.
 - **harness-gateway** — multi-platform IM channel bridge that normalizes incoming messages into a single processing pipeline.
 - **harness-memory** — hierarchical recall with full-text search, so an agent's memory travels with its workspace.
 - **harness-browser** — CDP-based browser automation with persistent profiles for web tasks.
 
-Instead of an external queue or message broker, Octop routes every surface — Web UI, IM, and cron — through one in-process `HarnessProcessor`. The result is a single, restart-safe process whose entire state is rebuilt from `~/.octop/octop.db` on boot.
+Instead of an external queue or message broker, VS Agent routes every surface — Web UI, IM, and cron — through one in-process `HarnessProcessor`. The result is a single, restart-safe process whose entire state is rebuilt from `~/.octop/octop.db` on boot.
 
 ## 🤔 Features
 
@@ -107,14 +107,14 @@ Instead of an external queue or message broker, Octop routes every surface — W
 
 ### ACP (Agent Client Protocol)
 
-Octop supports ACP in two directions:
+VS Agent supports ACP in two directions:
 
-1. **Inbound** — external tools use **your** Octop agent
+1. **Inbound** — external tools use **your** VS Agent agent
    ```bash
    octop acp --agent main   # stdio ACP server for Zed, OpenCode, …
    ```
 
-2. **Outbound** — Octop delegates to external coding agents
+2. **Outbound** — VS Agent delegates to external coding agents
    - Dashboard → **ACP** (`/acp`): configure runners (global per user)
    - Enable **acp_runner** per agent, then delegate in chat
 
@@ -344,7 +344,7 @@ OpenAI-compatible APIs, DashScope (Qwen), Ollama, and other presets — configur
 | Command | Description |
 |---------|-------------|
 | `octop init` | Bootstrap `~/.octop/` (DB, admin, JWT secret) |
-| `octop run` | Start Octop in the foreground |
+| `octop run` | Start VS Agent in the foreground |
 | `octop service start` | Install and start as a system service |
 | `octop service stop` | Stop the system service |
 | `octop agent` | Create, list, start/stop agents |
@@ -365,7 +365,7 @@ Full reference: **[docs/cli.md](docs/cli.md)**.
 After `octop run`, open **http://127.0.0.1:8088**.
 
 <p align="center">
-  <img src="docs/assets/readme-chat.png" alt="Octop Web Dashboard" width="800" />
+  <img src="docs/assets/readme-chat.png" alt="VS Agent Web Dashboard" width="800" />
 </p>
 
 - **Chat** — real-time conversation with agents

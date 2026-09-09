@@ -52,7 +52,7 @@ export function IosGuide({ onClose }: { onClose: () => void }) {
           <X size={18} />
         </button>
         <div className={styles.guideTitle}>添加到主屏幕</div>
-        <p className={styles.guideDesc}>将 Octop 安装为 App，随时一键打开。</p>
+        <p className={styles.guideDesc}>将威小蜜AI 安装为 App，随时一键打开。</p>
         <ol className={styles.guideList}>
           <li>
             <span className={styles.guideStep}>1</span>
