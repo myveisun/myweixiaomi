@@ -67,7 +67,7 @@ LABEL maintainer="OrcaKit Team"
 LABEL org.opencontainers.image.title="Octop"
 LABEL org.opencontainers.image.description="Smarter self-hosted AI assistant — multi-user, multi-agent."
 LABEL org.opencontainers.image.source="https://github.com/TencentCloud/orca"
-LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.licenses="VeiSun"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \

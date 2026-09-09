@@ -41,7 +41,7 @@ LABEL maintainer="TencentCloud OrcaKit"
 LABEL org.opencontainers.image.title="Octop"
 LABEL org.opencontainers.image.description="Smarter self-hosted AI assistant — multi-user, multi-agent (FnOS build with all addons)."
 LABEL org.opencontainers.image.source="https://github.com/TencentCloud/Octop"
-LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.licenses="VeiSun"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \

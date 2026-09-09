@@ -1,21 +1,66 @@
-MIT License
+VeiSun Networks Software License Agreement
 
-Copyright (c) 2026 Octop
+Copyright (c) 2026 VeiSun Networks (威尚网络)
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Product: 威小蜜AI (VS Agent)
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+本协议（下称"本协议"）由威尚网络（VeiSun Networks）与您（下称"被许可方"）就
+威小蜜AI（VS Agent）软件及其文档（下称"本软件"）的使用达成。使用本软件即视为
+您已阅读并同意本协议全部条款。
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+---
+
+一、许可授予
+
+1.1 社区许可（免费）
+   - 被许可方有权在非商业环境中自由使用、复制、修改本软件。
+   - 被许可方有权在个人、家庭、学习、研究或内部测试场景中部署本软件。
+   - 被许可方不得将本软件的免费许可用于直接或间接的商业盈利目的（包括但不限于：
+     向第三方销售本软件、提供本软件的托管服务、以本软件为基础对外提供收费服务）。
+
+1.2 商业许可（需授权）
+   - 企业、组织或个人如需将本软件用于商业用途（含企业内部分队部署、对外提供
+     服务、二次开发后销售等），须获得威尚网络（VeiSun Networks）的书面商业授权。
+   - 商业授权可通过官方网站 https://www.veisun.net 联系获取。
+   - 未取得商业授权而将本软件用于商业目的的行为，均构成对本协议的违反。
+
+---
+
+二、商标与品牌
+
+2.1 "威小蜜AI"、"VS Agent"及相关标识（含吉祥物、图标、界面设计）均为
+     威尚网络（VeiSun Networks）的商标或品牌资产。
+2.2 被许可方在修改、分发本软件时，不得移除或篡改本软件中的品牌标识、
+     版权声明与本协议文本。
+2.3 被许可方不得以任何可能造成混淆的方式使用"威小蜜AI"或"VS Agent"名称
+     从事与本软件无关的业务。
+
+---
+
+三、源代码与二次开发
+
+3.1 被许可方可在获得相应许可的前提下，基于本软件进行修改与二次开发。
+3.2 对于社区许可下的修改版本，应保留原版权声明与本协议；涉及商业分发时，
+     须取得商业授权。
+3.3 本软件的部分组件可能采用第三方开源许可证（如 MIT、Apache-2.0 等），
+     第三方组件的许可条款优先适用于该等组件。
+
+---
+
+四、免责声明
+
+本软件按"现状"提供，不附带任何明示或暗示的担保，包括但不限于对适销性、
+特定用途适用性及不侵权的担保。在任何情况下，威尚网络（VeiSun Networks）
+或其贡献者均不对因使用或无法使用本软件而导致的任何直接、间接、偶然、
+特殊或后果性损害承担责任。
+
+---
+
+五、其他
+
+5.1 本协议受中华人民共和国法律管辖。
+5.2 威尚网络（VeiSun Networks）保留对本协议的解释权与修改权；重大变更
+     将在官方网站 https://www.veisun.net 公布。
+5.3 本协议条款若因任何原因被认定为无效或不可执行，其余条款仍应保持有效。
+
+Copyright (c) 2026 VeiSun Networks (威尚网络). All rights reserved.

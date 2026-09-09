@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://www.python.org/downloads/"><img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-blue?logo=python&logoColor=white" /></a>
-  <a href="https://github.com/TencentCloud/Octop/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green" /></a>
+  <a href="https://github.com/myveisun/myweixiaomi/blob/main/LICENSE"><img alt="License: VeiSun" src="https://img.shields.io/badge/license-VeiSun-39559e" /></a>
   <a href="https://pypi.org/project/octop/"><img src="https://img.shields.io/pypi/v/octop" alt="PyPI" /></a>
   <a href="https://github.com/astral-sh/ruff"><img alt="Code Style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-000000?logo=ruff&logoColor=white" /></a>
   <a href="https://github.com/TencentCloud/Octop"><img alt="GitHub stars" src="https://img.shields.io/github/stars/TencentCloud/Octop?style=social" /></a>
@@ -496,11 +496,11 @@ cd dashboard && npx tsc --noEmit
 如需加入客户企业微信服务群，请扫码：
 
 <p align="center">
-  <img src="docs/assets/qrcode.png" alt="客户企业微信服务群二维码" width="220" />
+  <img src="docs/assets/wechat_qrcode.png" alt="客户企业微信服务群二维码" width="220" />
 </p>
 
 > 请扫码进入工作群，如有任何疑问或需求，请直接联系群管理员对接处理。
 
 ### 📄 许可证
 
-本项目采用 [MIT License](LICENSE)。
+本项目采用 [威尚网络软件许可协议（VeiSun Networks Software License Agreement）](LICENSE)：社区与个人非商业使用免费；商业使用需向威尚网络（VeiSun Networks）取得商业授权。

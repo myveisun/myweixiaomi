@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="https://www.python.org/downloads/"><img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-blue?logo=python&logoColor=white" /></a>
-  <a href="https://github.com/TencentCloud/Octop/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-green" /></a>
+  <a href="https://github.com/myveisun/myweixiaomi/blob/main/LICENSE"><img alt="License: VeiSun" src="https://img.shields.io/badge/license-VeiSun-39559e" /></a>
   <a href="https://github.com/TencentCloud/Octop/releases"><img alt="Version" src="https://img.shields.io/badge/version-0.9.32-orange" /></a>
   <a href="https://pypi.org/project/octop/"><img src="https://img.shields.io/pypi/v/octop" alt="PyPI" /></a>
   <a href="https://github.com/astral-sh/ruff"><img alt="Code Style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-000000?logo=ruff&logoColor=white" /></a>
@@ -488,11 +488,11 @@ See [CHANGELOG.md](CHANGELOG.md) for release history.
 For the customer WeCom support group, scan:
 
 <p align="center">
-  <img src="docs/assets/qrcode.png" alt="WeCom customer group QR code" width="220" />
+  <img src="docs/assets/wechat_qrcode.png" alt="WeCom customer group QR code" width="220" />
 </p>
 
 > Please scan the QR code to join the group. For any questions or assistance, please contact the group admin directly.
 
 ## 📄 License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [VeiSun Networks Software License Agreement](LICENSE): free for community and personal use; commercial use requires a commercial authorization from VeiSun Networks (威尚网络).

@@ -35,7 +35,7 @@ fnos/
 ├── docker/                 # Docker 版（docker-project）
 │   ├── manifest            # 应用元信息（platform=all / 名称/版本/桌面入口等）
 │   ├── ICON.PNG / ICON_256.PNG
-│   ├── LICENSE             # 复用仓库根 LICENSE（MIT）
+│   ├── LICENSE             # 复用仓库根 LICENSE（威小蜜AI / VS Agent 品牌协议）
 │   ├── cmd/                # 生命周期脚本（main / install_callback / config_callback 等）
 │   ├── config/
 │   │   ├── privilege       # 权限声明（docker-octop 用户）

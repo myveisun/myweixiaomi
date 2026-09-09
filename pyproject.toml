@@ -7,7 +7,7 @@ name = "octop"
 version = "0.9.32"
 description = "Smarter self-hosted AI assistant for multiple users and agents, built on harness-agent"
 readme = "README.md"
-license = { text = "MIT" }
+license = { text = "VeiSun Networks Software License Agreement (commercial licenses)" }
 requires-python = ">=3.12"
 authors = [{name = "octop contributors"}]
 dependencies = [
