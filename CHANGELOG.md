@@ -6,6 +6,48 @@
 
 ## [Unreleased]
 
+### 新增
+
+- 知识库支持下载上传原文；PDF / DOCX / PPTX / XLSX 在预览弹窗中按原排版查看；文档区支持拖拽上传（#591）
+- 知识库 / 工作区 PDF 预览改用 PDF.js（react-pdf），替代浏览器内置 iframe 查看器
+- 技能包支持将选定技能一次性复制到专家工作区，工作区技能也可推送到当前用户有写权限的技能包（#618）。
+- 记忆树支持手动新建主题/记忆，以及编辑已有记忆（replace/supersede，保留变更历史）。
+- Token 统计支持日期范围筛选（RangePicker 预设 + 自定义起止）并导出 Excel 用量明细（#154）
+- Token 用量 Excel 含专家名称、中英列表头，以及按天/专家/模型汇总 sheet 与图表
+- Token 用量 Excel 按报表规范打磨：冻结表头、千分位、合计公式行、筛选与仪表盘配色柱图
+- 知识库卡片「更多」菜单可一键添加到当前会话
+
+### 修复
+
+- OpenCode Go：发往 `opencode.ai/zen/go` 的聊天请求通过 harness `session_header` 携带当前对话 `thread_id` 作为 `x-opencode-session`，修复模型调用报 `400 MissingSessionID`。连接测试与模型列表使用一次性 UUID。用户手动配置的同名请求头优先。需要 `orcakit-harness-agent>=1.0.7`。
+- harness 进程日志目录改为传给 `HarnessAgentManager(log_dir=…)`（`HarnessAgentConfig.log_dir` 在 1.0.7 已是丢弃的 InitVar），避免诊断日志落到 `~/.harness-agent/logs`。
+- `octop service start` / `restart` 通过 systemd drop-in 设置 `LimitNOFILE`（系统服务 65535；用户服务不超过当前 hard rlimit），不改写已有 unit。`restart` 在 drop-in 失败时仍会 `systemctl restart`，保证升级后能起来。
+- 记忆树详情接入 `user_edit` lineage，人工修正后显示“人工修正的记忆”、修正前内容和原始来源上下文。
+- 共享专家的技能列表现在会在聊天输入框中加载，非所有者可查看并选择专家已配置的技能
+- 知识库文本文档编辑抽屉在「编辑」模式下点「保存」无响应（`name`/`format` 字段未挂载时 `validateFields` 缺值导致抛错被吞掉；#592）
+- 知识库文本文档编辑内容未改时点「保存」只关闭抽屉，不触发更新与重建索引
+- 版本升级界面的检查失败提示支持中英本地化：`/update/status` 与 `/update/check` 增加 `error_code` 字段（`pypi_unreachable`），界面按语言展示可读文案；版本信息来自镜像时显示来源提示；`octop update` 失败提示补充网络/代理排查建议
+- SQLite 历史回填为 checkpoint 内容引用创建绑定只读连接的独立解码器和缓存，并在同一读事务内读取，避免访问运行中的 saver 连接；兼容原有 inline 格式。新格式需要配套安装提供 `CheckpointSerializer.with_connection` 的 harness-memory。PostgreSQL 保持原生 graph 历史读取路径。
+- 共享连接器卡片标题被「来自 X」标签挤压截断看不清：标签移至标题下方独立一行；连接器实例与内置目录卡片的长标题截断后悬停均可显示完整标题（#626）
+- 暗色模式下 Tooltip 背景近乎透明、文字与页面内容叠印无法阅读（#626）
+
+### 变更
+
+- 聊天输入框点 skill 改为插入行首 ``/slug``（与斜杠菜单同一套），不再通过 ``skills`` 白名单过滤本轮技能。``@`` 菜单不再列出 skill。
+- 启动专家时把 workspace ``manifest.json`` 的指引卡片写入 harness metadata；之后每次 ``list_peers`` / ``agent_list`` / ``@`` 注入会再读一遍，编辑页面改卡片后无需重启。
+- ``ask_agent`` 在对方专家留下正常对话：用调用方 ``session_key`` 换 agent 前缀、用调用方 ``thread_id~对方id`` 作为稳定 thread，写入 ``threads`` / 历史投影，不走 gateway 进线、不抢对方当前绑定会话。
+- 新格式历史改为事件内容提交成功后才转发，移除 200ms 写入限频；只更新变化的消息并复用长文本块，写入失败停止转发该内容。
+- 聊天运行轨迹采用宽抽屉时间线，并从 harness 实况汇聚回合上下文。
+- 依赖 `harness-gateway>=0.9.6`（飞书话题回复落在原话题，并以 `thread_id` 作为会话标识）
+
+### 新增
+
+- 可选的分段历史归档：旧会话的新回合可切换至独立 SQLite，正文在消息与轨迹之间共享；兼容读取、游标分页、失败重试及关闭开关回退均保留旧记录，不执行旧数据迁移或 checkpoint 清理。参见 `docs/versioned-history.md`。
+
+### 变更
+
+- 技能包与知识库的创建/编辑改为右侧抽屉；编辑/删除收入左侧列表卡片的「更多」菜单
+
 ## [0.9.32] - 2026-09-06
 
 ### 新增
@@ -20,6 +62,18 @@
 
 ### 修复
 
+- 斜杠命令写入 harness 会话 checkpoint，刷新后仍可见，且下一轮模型能读到
+- 桌面客户端打包把 `pyproject.toml` 版本写入 macOS Info.plist、Windows 文件版本和 NSIS 安装器，不再沿用写死的旧号
+- 用户发布专家卡片展示快照内自定义头像（`icon_url` + `/api/experts/published/{id}/avatar`），不再只显示默认 Lucide 图标
+- 用户管理表格（桌面端）横向滚动时固定用户名与操作列（与专家列表一致；移动端不固定）
+- 运行轨迹流式事件在内存聚合、回合边界持久化，避免逐 token 写库和重复存储上下文全文
+- 运行轨迹 Turns / Calls 折叠与耗时投影：历史缺 `turn_id` / 时长时回退为 USER 边界与内容体量估算，避免开关无效
+- 知识库表格模式宽屏仍出现多余水平滚动条（列宽拖拽手柄越出最后一列）
+- 聊天右侧停靠/弹窗工具栏避开无边框窗口按钮，避免与红绿灯重叠
+- 桌面启动页改为白底卡片和底部进度条；Windows 设置窗加高，避免底边距被裁掉
+- 桌面壳内隐藏「安装为桌面应用」，避免在已原生窗口里再提示 PWA 安装
+- 日志按大小+按日轮转，并采用 logrotate 风格的 `compress` + `delaycompress`（最新一份轮转文件暂不 gzip，下一轮再压；用 Python 标准库，Windows 可用）
+- 远程手机自动安装 Docker 后，非 root 时用 `sudo -n` 写 `daemon.json` 并重启 dockerd
 - 旧备份在 schema 变更后可恢复；桌面打包版本与应用元数据对齐
 - 主动关怀时区、专家卡片头像、用户表固定列
 - 运行轨迹写库开销、日志轮转、通道二维码轮询与远程 Docker 安装权限

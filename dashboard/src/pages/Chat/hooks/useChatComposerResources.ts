@@ -9,24 +9,24 @@ import {
   type KnowledgeBase,
 } from "../../../api/modules/knowledgeBases";
 import type { ResolvedModel } from "../../../api/types";
-import type { SkillSpec } from "../../Agent/Skills/useSkills";
 import { CONNECTORS_CHANGED_EVENT } from "../../Agent/Connectors/customMcpUtils";
 import { useCurrentUser } from "../../../hooks/useCurrentUser";
 import { activeModelToRef } from "./useChatContextWindow";
 import {
   hasSavedConnectors,
   loadSavedConnectors,
-  loadSavedSkills,
   saveConnectors,
-  saveSkills,
 } from "../utils/chatStorage";
 import { resolveInitialConnectors } from "../utils/resolveInitialConnectors";
+import {
+  consumePendingAttachKnowledgeBaseId,
+  peekPendingAttachKnowledgeBaseId,
+} from "../utils/pendingAttachKnowledgeBase";
 import { withDefaultOpenKnowledgeBases } from "../utils/withDefaultOpenKnowledgeBases";
 import { isPendingThread } from "./useSessions";
 
 export function useChatComposerResources(
   resolvedAgentId: string | null | undefined,
-  chatSkills: SkillSpec[],
   activeThreadId?: string | null,
   stickyModel?: string | null,
   stickyReasoningMode?: "auto" | "enabled" | "disabled" | null,
@@ -35,7 +35,6 @@ export function useChatComposerResources(
   const user = useCurrentUser();
   const currentUserId = user?.id ?? null;
   const [selectedConnectors, setSelectedConnectors] = useState<string[]>([]);
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [selectedKnowledgeBaseIds, setSelectedKnowledgeBaseIds] = useState<
     string[]
   >([]);
@@ -174,28 +173,18 @@ export function useChatComposerResources(
   }, [resolvedAgentId, currentUserId]);
 
   useEffect(() => {
-    if (!resolvedAgentId) {
-      setSelectedSkills([]);
-      return;
-    }
-    const allowed = new Set(
-      chatSkills.filter((s) => s.enabled).map((s) => s.slug),
-    );
-    setSelectedSkills((prev) => {
-      const saved = loadSavedSkills(resolvedAgentId);
-      const base = prev.length > 0 ? prev : saved;
-      return base.filter((n) => allowed.has(n));
-    });
-  }, [resolvedAgentId, chatSkills]);
-
-  useEffect(() => {
     let cancelled = false;
-    setSelectedKnowledgeBaseIds([]);
+    const pendingId = peekPendingAttachKnowledgeBaseId();
+    setSelectedKnowledgeBaseIds(pendingId ? [pendingId] : []);
     setChatKnowledgeBases(undefined);
     void knowledgeBasesApi
       .getCapability()
       .then((capability) => {
-        if (cancelled || !capability.usable) return;
+        if (cancelled) return;
+        if (!capability.usable) {
+          if (pendingId) consumePendingAttachKnowledgeBaseId();
+          return;
+        }
         return knowledgeBasesApi.list().then((bases) => {
           if (cancelled) return;
           setChatKnowledgeBases(bases);
@@ -208,8 +197,14 @@ export function useChatComposerResources(
             )
             .map((base) => base.id);
           setSelectedKnowledgeBaseIds((previous) =>
-            withDefaultOpenKnowledgeBases(previous, ownedDefaults),
+            withDefaultOpenKnowledgeBases(
+              pendingId && !previous.includes(pendingId)
+                ? [...previous, pendingId]
+                : previous,
+              ownedDefaults,
+            ),
           );
+          if (pendingId) consumePendingAttachKnowledgeBaseId();
         });
       })
       .catch(() => {
@@ -282,14 +277,6 @@ export function useChatComposerResources(
     (names: string[]) => {
       setSelectedConnectors(names);
       if (resolvedAgentId) saveConnectors(resolvedAgentId, names);
-    },
-    [resolvedAgentId],
-  );
-
-  const handleSkillsChange = useCallback(
-    (names: string[]) => {
-      setSelectedSkills(names);
-      if (resolvedAgentId) saveSkills(resolvedAgentId, names);
     },
     [resolvedAgentId],
   );
@@ -369,14 +356,12 @@ export function useChatComposerResources(
     reasoningEffort,
     handleReasoningChange,
     selectedConnectors,
-    selectedSkills,
     selectedKnowledgeBaseIds,
     chatConnectors,
     chatKnowledgeBases,
     availableModels,
     activeModelRef,
     handleConnectorsChange,
-    handleSkillsChange,
     handleKnowledgeBaseIdsChange,
   };
 }

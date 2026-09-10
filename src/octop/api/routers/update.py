@@ -49,6 +49,8 @@ def _build_status(
     *,
     latest: str | None = None,
     error: str | None = None,
+    error_code: str | None = None,
+    source: str | None = None,
     release_notes: str | None = None,
 ) -> dict[str, Any]:
     current = get_brand_version()
@@ -70,6 +72,8 @@ def _build_status(
         "service_mode": detect_service_mode(),
         "desktop": _is_desktop_process(),
         "error": error,
+        "error_code": error_code if error else None,
+        "source": source if latest is not None else None,
         "last_check_time": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "release_notes": release_notes if has_update else None,
     }
@@ -92,11 +96,17 @@ async def check_for_updates(_: Any = Depends(require_permission("update"))) -> d
         release = await asyncio.to_thread(fetch_latest_brand_release)
     except BrandNoReleaseError:
         return await asyncio.to_thread(
-            _build_status, latest=None, error="no_release_yet"
+            _build_status,
+            latest=None,
+            error="no_release_yet",
+            error_code="no_release_yet",
         )
     if release is None:
         return await asyncio.to_thread(
-            _build_status, latest=None, error="could_not_reach_brand_update_source"
+            _build_status,
+            latest=None,
+            error="could not reach brand update source",
+            error_code="could_not_reach_brand_update_source",
         )
     return await asyncio.to_thread(
         _build_status, latest=release.version, release_notes=release.body
@@ -105,7 +115,30 @@ async def check_for_updates(_: Any = Depends(require_permission("update"))) -> d
 
 async def _upgrade_worker(task_id: str) -> None:
     await update_task(task_id, stage="downloading", percent=20)
-    result: UpgradeResult = await asyncio.to_thread(run_upgrade, verbose=False)
+    upgrade_task = asyncio.create_task(asyncio.to_thread(run_upgrade, verbose=False))
+    percent = 20
+    try:
+        while True:
+            try:
+                result: UpgradeResult = await asyncio.wait_for(
+                    asyncio.shield(upgrade_task),
+                    timeout=5,
+                )
+                break
+            except TimeoutError:
+                percent = min(percent + 5, 85)
+                await update_task(task_id, stage="installing", percent=percent)
+    except Exception as exc:
+        logger.exception("upgrade task %s failed unexpectedly", task_id)
+        await update_task(
+            task_id,
+            status=UpgradeTaskStatus.ERROR,
+            stage="error",
+            percent=None,
+            success=False,
+            error=str(exc) or type(exc).__name__,
+        )
+        return
     mirror_errors = result.mirror_errors or None
     if not result.success:
         await update_task(

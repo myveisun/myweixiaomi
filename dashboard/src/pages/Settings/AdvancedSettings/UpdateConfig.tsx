@@ -4,6 +4,7 @@ import { Collapse } from "antd";
 import {
   BookOpen,
   CheckCircle,
+  Info,
   RefreshCw,
   XCircle,
   AlertTriangle,
@@ -114,6 +115,7 @@ export default function UpdateConfig() {
   const { restartPhase, isRestarting, requestRestart, executeRestart } =
     useServiceRestartContext();
   const pollTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pollFailRef = useRef(0);
   const autoRestartedRef = useRef(false);
 
   useEffect(() => {
@@ -152,6 +154,7 @@ export default function UpdateConfig() {
   const pollProgress = useCallback(async (taskId: string) => {
     try {
       const prog = await updateApi.getUpgradeProgress(taskId);
+      pollFailRef.current = 0;
       setProgress(prog);
       if (prog.status === "running") {
         pollTimerRef.current = setTimeout(() => pollProgress(taskId), 800);
@@ -168,14 +171,31 @@ export default function UpdateConfig() {
             .catch(() => {});
         }
       }
-    } catch {
+    } catch (err: unknown) {
+      pollFailRef.current += 1;
+      if (pollFailRef.current < 5) {
+        pollTimerRef.current = setTimeout(() => pollProgress(taskId), 800);
+        return;
+      }
       setUpgrading(false);
+      const message = err instanceof Error ? err.message : String(err);
+      setProgress({
+        task_id: taskId,
+        status: "error",
+        stage: "error",
+        percent: null,
+        new_version: null,
+        success: false,
+        error: message,
+        mirror_errors: null,
+      });
     }
   }, []);
 
   const handleUpgrade = useCallback(async () => {
     setUpgrading(true);
     setProgress(null);
+    pollFailRef.current = 0;
     autoRestartedRef.current = false;
     try {
       const started = await updateApi.triggerUpgrade();
@@ -313,7 +333,11 @@ export default function UpdateConfig() {
             <div className={`${styles.alert} ${styles.alertError}`}>
               <XCircle size={15} />
               <span>
-                {errorText(status.error)}
+                {status.error_code
+                  ? t(`advancedSettings.update.errors.${status.error_code}`, {
+                      defaultValue: status.error,
+                    })
+                  : errorText(status.error)}
                 <br />
                 <a
                   className={styles.checkSourceLink}
@@ -324,6 +348,17 @@ export default function UpdateConfig() {
                   {t("advancedSettings.update.releasesLink")}
                   <ExternalLink size={12} />
                 </a>
+              </span>
+            </div>
+          )}
+
+          {status?.source && status.source !== "pypi.org" && !status.error && (
+            <div className={`${styles.alert} ${styles.alertInfo}`}>
+              <Info size={15} />
+              <span>
+                {t("advancedSettings.update.mirrorSource", {
+                  source: status.source,
+                })}
               </span>
             </div>
           )}

@@ -4,12 +4,14 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type DragEvent,
 } from "react";
 import {
   Alert,
   App,
   Button,
   Drawer,
+  Dropdown,
   Empty,
   Form,
   Input,
@@ -27,6 +29,7 @@ import {
   Tooltip,
   Typography,
 } from "antd";
+import type { MenuProps } from "antd";
 import { ResizableTable } from "@/components/ResizableTable";
 import {
   Check,
@@ -39,6 +42,8 @@ import {
   FolderPlus,
   LayoutGrid,
   List as ListIcon,
+  MessageSquarePlus,
+  MoreHorizontal,
   PanelLeftClose,
   PanelLeftOpen,
   Pencil,
@@ -54,6 +59,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { userCan } from "../../utils/permissions";
+import type { OctopUser } from "../../api/modules/auth";
 import {
   DEFAULT_KNOWLEDGE_LIMITS,
   knowledgeBasesApi,
@@ -63,6 +69,8 @@ import {
   type KnowledgeOnnxModel,
 } from "../../api/modules/knowledgeBases";
 import { OctopEmptyMascot } from "../../components/EmptyState";
+import DocumentPreviewCore from "../../components/DocumentPreviewCore";
+import Markdown from "../../components/Markdown";
 import StreamSetupGuide from "../../components/StreamSetupGuide/StreamSetupGuide";
 import { CopyableResourceId } from "../../components/CopyableResourceId";
 import { useCardTableView } from "../../hooks/useCardTableView";
@@ -73,9 +81,12 @@ import { useServerTimezone } from "../../hooks/useServerTimezone";
 import PageShell from "../../layouts/PageShell";
 import { apiErrorMessage, isNotFoundApiError } from "../../utils/apiError";
 import { createDetailRequestGate } from "../../utils/detailRequestGate";
+import { getDocKind, type DocKind } from "../../utils/docKind";
 import { formatBytes, formatSizeGb } from "../../utils/embeddingDownload";
 import { fileTreeIconSpec } from "../../utils/fileTreeIcon";
 import { formatServerDateTime } from "../../utils/formatMessageTime";
+import { stripFrontmatter } from "../../utils/markdown";
+import { setPendingAttachKnowledgeBaseId } from "../Chat/utils/pendingAttachKnowledgeBase";
 import skillStyles from "../Agent/Skills/index.module.less";
 import { KNOWLEDGE_ICON_NAMES, knowledgeIconForName } from "./knowledgeIcons";
 import {
@@ -86,7 +97,11 @@ import {
   shouldOpenKnowledgeFolder,
 } from "./knowledgeFolder";
 import TextDocumentEditorModal, {
+  canDownloadKnowledgeOriginal,
+  canPreviewKnowledgeDocument,
+  canRichPreviewKnowledgeDocument,
   isEditableKnowledgeDocument,
+  isKnowledgeMarkdownDocument,
   type TextDocumentFormat,
 } from "./TextDocumentEditorModal";
 import styles from "./index.module.less";
@@ -122,6 +137,28 @@ function fileExtensionLabel(filename: string): string {
     ? filename.slice(filename.lastIndexOf(".") + 1)
     : "";
   return ext.trim().toUpperCase().slice(0, 5);
+}
+
+/** Match ``<input accept>`` extension tokens (e.g. ``.pdf,.docx``). */
+function fileMatchesAccept(file: File, acceptCsv: string): boolean {
+  const tokens = acceptCsv
+    .split(",")
+    .map((token) => token.trim().toLowerCase())
+    .filter(Boolean);
+  if (tokens.length === 0) return true;
+  const name = file.name.toLowerCase();
+  return tokens.some((token) =>
+    token.startsWith(".") ? name.endsWith(token) : false,
+  );
+}
+
+function canManageKnowledgeBase(
+  base: Pick<KnowledgeBase, "owner_user_id">,
+  user: OctopUser | null,
+): boolean {
+  return Boolean(
+    user && (user.role === "admin" || base.owner_user_id === user.id),
+  );
 }
 
 function formatKnowledgeOwner(
@@ -266,8 +303,8 @@ export default function KnowledgeBasesPage() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [mobilePane, setMobilePane] = useState<"list" | "detail">("list");
-  const [baseModalOpen, setBaseModalOpen] = useState(false);
-  const [editingBase, setEditingBase] = useState(false);
+  const [baseDrawerOpen, setBaseDrawerOpen] = useState(false);
+  const [editingBaseId, setEditingBaseId] = useState<string | null>(null);
   const [featureModalOpen, setFeatureModalOpen] = useState(false);
   const [onnxProbe, setOnnxProbe] = useState<{
     ok: boolean;
@@ -302,6 +339,10 @@ export default function KnowledgeBasesPage() {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewFilename, setPreviewFilename] = useState("");
   const [previewText, setPreviewText] = useState("");
+  const [previewKind, setPreviewKind] = useState<DocKind | null>(null);
+  const [previewDocId, setPreviewDocId] = useState<string | null>(null);
+  const [previewHasOriginal, setPreviewHasOriginal] = useState(false);
+  const [previewAsMarkdown, setPreviewAsMarkdown] = useState(false);
   const [textEditorOpen, setTextEditorOpen] = useState(false);
   const [textEditorMode, setTextEditorMode] = useState<"create" | "edit">(
     "create",
@@ -323,6 +364,8 @@ export default function KnowledgeBasesPage() {
     percent: number;
   } | null>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
+  const dragDepthRef = useRef(0);
+  const [dragActive, setDragActive] = useState(false);
   const detailRequestGate = useRef(createDetailRequestGate());
   const {
     size: sidebarWidth,
@@ -338,9 +381,7 @@ export default function KnowledgeBasesPage() {
     useListPanelCollapsed("octop:knowledge-bases:list-collapsed");
 
   const canManageSelected = Boolean(
-    selected &&
-      user &&
-      (user.role === "admin" || selected.owner_user_id === user.id),
+    selected && canManageKnowledgeBase(selected, user),
   );
   const canWriteSelected = canManageSelected;
   const usable = Boolean(capability?.usable);
@@ -644,22 +685,21 @@ export default function KnowledgeBasesPage() {
     });
     setDefaultOpenChecked(false);
     setSharedChecked(false);
-    setEditingBase(false);
-    setBaseModalOpen(true);
+    setEditingBaseId(null);
+    setBaseDrawerOpen(true);
   };
 
-  const openEdit = () => {
-    if (!selected) return;
+  const openEdit = (base: KnowledgeBase) => {
     baseForm.setFieldsValue({
-      name: selected.name,
-      description: selected.description,
-      icon_name: selected.icon_name || undefined,
-      max_documents: selected.max_documents,
+      name: base.name,
+      description: base.description,
+      icon_name: base.icon_name || undefined,
+      max_documents: base.max_documents,
     });
-    setDefaultOpenChecked(selected.default_open);
-    setSharedChecked(selected.shared);
-    setEditingBase(true);
-    setBaseModalOpen(true);
+    setDefaultOpenChecked(base.default_open);
+    setSharedChecked(base.shared);
+    setEditingBaseId(base.id);
+    setBaseDrawerOpen(true);
   };
 
   const saveBase = async () => {
@@ -670,37 +710,40 @@ export default function KnowledgeBasesPage() {
       shared: sharedChecked,
     };
     try {
-      const next =
-        editingBase && selected
-          ? await knowledgeBasesApi.update(selected.id, payload)
-          : await knowledgeBasesApi.create(payload);
-      setBaseModalOpen(false);
+      const next = editingBaseId
+        ? await knowledgeBasesApi.update(editingBaseId, payload)
+        : await knowledgeBasesApi.create(payload);
+      setBaseDrawerOpen(false);
       await loadBases();
       await loadDetail(next.id);
       if (isMobile) setMobilePane("detail");
       message.success(
-        t(editingBase ? "knowledgeBases.updated" : "knowledgeBases.created"),
+        t(editingBaseId ? "knowledgeBases.updated" : "knowledgeBases.created"),
       );
     } catch (error) {
       message.error(apiErrorMessage(error, t("knowledgeBases.saveFailed"), t));
     }
   };
 
-  const deleteBase = async () => {
-    if (!selected) return;
-    const deletedId = selected.id;
-    detailRequestGate.current.begin();
-    setSelected(null);
-    setDocuments([]);
-    setDetailLoading(false);
+  const deleteBase = async (base: KnowledgeBase) => {
+    const deletedId = base.id;
+    const deletingSelected = deletedId === selected?.id;
+    if (deletingSelected) {
+      detailRequestGate.current.begin();
+      setSelected(null);
+      setDocuments([]);
+      setDetailLoading(false);
+    }
     try {
       await knowledgeBasesApi.delete(deletedId);
       const rows = await knowledgeBasesApi.list();
       setBases(rows);
-      if (isMobile) {
-        setMobilePane("list");
-      } else if (rows.length > 0) {
-        await loadDetail(rows[0].id);
+      if (deletingSelected) {
+        if (isMobile) {
+          setMobilePane("list");
+        } else if (rows.length > 0) {
+          await loadDetail(rows[0].id);
+        }
       }
       message.success(t("knowledgeBases.deleted"));
     } catch (error) {
@@ -708,6 +751,64 @@ export default function KnowledgeBasesPage() {
         apiErrorMessage(error, t("knowledgeBases.deleteFailed"), t),
       );
     }
+  };
+
+  const confirmDeleteBase = (base: KnowledgeBase) => {
+    modal.confirm({
+      title: t("knowledgeBases.deleteConfirm"),
+      okText: t("common.delete"),
+      cancelText: t("common.cancel"),
+      okButtonProps: { danger: true },
+      onOk: () => deleteBase(base),
+    });
+  };
+
+  const addBaseToChat = (base: KnowledgeBase) => {
+    setPendingAttachKnowledgeBaseId(base.id);
+    navigate("/chat", { state: { attachKnowledgeBaseId: base.id } });
+  };
+
+  const baseMenuItems = (base: KnowledgeBase): MenuProps["items"] => {
+    const canManage = canManageKnowledgeBase(base, user);
+    const items: MenuProps["items"] = [];
+    if (usable) {
+      items.push({
+        key: "addToChat",
+        icon: <MessageSquarePlus size={14} />,
+        label: t("knowledgeBases.addToChat"),
+        onClick: ({ domEvent }) => {
+          domEvent.stopPropagation();
+          addBaseToChat(base);
+        },
+      });
+    }
+    if (canManage) {
+      if (items.length > 0) {
+        items.push({ type: "divider" });
+      }
+      items.push(
+        {
+          key: "edit",
+          icon: <Pencil size={14} />,
+          label: t("common.edit"),
+          onClick: ({ domEvent }) => {
+            domEvent.stopPropagation();
+            openEdit(base);
+          },
+        },
+        {
+          key: "delete",
+          icon: <Trash2 size={14} />,
+          label: t("common.delete"),
+          danger: true,
+          onClick: ({ domEvent }) => {
+            domEvent.stopPropagation();
+            confirmDeleteBase(base);
+          },
+        },
+      );
+    }
+    return items;
   };
 
   // A probe describes one model; drop it as soon as the draft points elsewhere.
@@ -883,13 +984,31 @@ export default function KnowledgeBasesPage() {
     message.info(t("models.localDownloadBackground"));
   };
 
-  const uploadDocuments = async (files: FileList | null) => {
+  const uploadDocuments = async (files: FileList | File[] | null) => {
     if (!selected || !files || !usable || isAtDocumentLimit) return;
     const remaining = Math.max(
       0,
       (selected?.max_documents ?? limits.max_docs_per_kb) - fileCount,
     );
-    const chosen = Array.from(files).slice(0, remaining);
+    const incoming = Array.from(files);
+    const matched = incoming.filter((file) =>
+      fileMatchesAccept(file, supportedDocumentTypes),
+    );
+    const skippedType = incoming.length - matched.length;
+    if (skippedType > 0) {
+      message.warning(
+        t("knowledgeBases.dropUploadUnsupported", { count: skippedType }),
+      );
+    }
+    const chosen = matched.slice(0, remaining);
+    if (chosen.length === 0) return;
+    if (matched.length > remaining) {
+      message.warning(
+        t("knowledgeBases.documentLimitReached", {
+          count: selected?.max_documents ?? limits.max_docs_per_kb,
+        }),
+      );
+    }
     const oversized = chosen.filter(
       (file) => file.size > limits.max_document_bytes,
     );
@@ -937,6 +1056,47 @@ export default function KnowledgeBasesPage() {
       setUploadState(null);
       if (uploadRef.current) uploadRef.current.value = "";
     }
+  };
+
+  const canDropUpload =
+    canWriteSelected && usable && !isAtDocumentLimit && !uploadState;
+
+  const resetDragActive = () => {
+    dragDepthRef.current = 0;
+    setDragActive(false);
+  };
+
+  const handleDocsDragEnter = (event: DragEvent<HTMLDivElement>) => {
+    if (!canDropUpload) return;
+    if (![...event.dataTransfer.types].includes("Files")) return;
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepthRef.current += 1;
+    setDragActive(true);
+  };
+
+  const handleDocsDragLeave = (event: DragEvent<HTMLDivElement>) => {
+    if (!canDropUpload && !dragActive) return;
+    event.preventDefault();
+    event.stopPropagation();
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) setDragActive(false);
+  };
+
+  const handleDocsDragOver = (event: DragEvent<HTMLDivElement>) => {
+    if (!canDropUpload) return;
+    if (![...event.dataTransfer.types].includes("Files")) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "copy";
+  };
+
+  const handleDocsDrop = (event: DragEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    resetDragActive();
+    if (!canDropUpload) return;
+    void uploadDocuments(event.dataTransfer.files);
   };
 
   const createFolder = async () => {
@@ -1018,21 +1178,45 @@ export default function KnowledgeBasesPage() {
     }
   };
 
-  const openDocumentPreview = async (documentId: string) => {
-    if (!selected) return;
+  const openDocumentPreview = async (document: KnowledgeDocument) => {
+    if (!selected || document.is_dir) return;
+    if (!canPreviewKnowledgeDocument(document)) return;
+    const rich = canRichPreviewKnowledgeDocument(document);
+    const kind = rich ? getDocKind(document.filename) : null;
+    const asMarkdown = isKnowledgeMarkdownDocument(document);
     setPreviewOpen(true);
-    setPreviewLoading(true);
-    setPreviewFilename("");
+    setPreviewFilename(document.filename);
+    setPreviewKind(kind);
+    setPreviewDocId(document.id);
+    setPreviewHasOriginal(canDownloadKnowledgeOriginal(document));
+    setPreviewAsMarkdown(asMarkdown);
     setPreviewText("");
+    if (kind) {
+      setPreviewLoading(false);
+      return;
+    }
+    setPreviewLoading(true);
     try {
-      const preview = await knowledgeBasesApi.previewDocument(
-        selected.id,
-        documentId,
-      );
-      setPreviewFilename(preview.filename);
-      setPreviewText(
-        preview.text.trim() ? preview.text : t("knowledgeBases.previewEmpty"),
-      );
+      // Prefer raw UTF-8 for editable text so markdown preview matches the file.
+      if (asMarkdown || isEditableKnowledgeDocument(document)) {
+        const payload = await knowledgeBasesApi.getTextDocument(
+          selected.id,
+          document.id,
+        );
+        setPreviewFilename(payload.filename);
+        setPreviewText(
+          payload.text.trim() ? payload.text : t("knowledgeBases.previewEmpty"),
+        );
+      } else {
+        const preview = await knowledgeBasesApi.previewDocument(
+          selected.id,
+          document.id,
+        );
+        setPreviewFilename(preview.filename);
+        setPreviewText(
+          preview.text.trim() ? preview.text : t("knowledgeBases.previewEmpty"),
+        );
+      }
     } catch (error) {
       setPreviewOpen(false);
       message.error(
@@ -1042,6 +1226,41 @@ export default function KnowledgeBasesPage() {
       setPreviewLoading(false);
     }
   };
+
+  const downloadDocumentOriginal = async (
+    documentId: string,
+    filename: string,
+  ) => {
+    if (!selected) return;
+    try {
+      const blob = await knowledgeBasesApi.fetchDocumentFile(
+        selected.id,
+        documentId,
+        "attachment",
+      );
+      const url = URL.createObjectURL(blob);
+      const a = window.document.createElement("a");
+      a.href = url;
+      a.download = filename || "download";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      message.error(
+        apiErrorMessage(error, t("knowledgeBases.downloadOriginalFailed"), t),
+      );
+    }
+  };
+
+  const fetchPreviewBlob = useCallback(async () => {
+    if (!selected || !previewDocId) {
+      throw new Error("missing knowledge document preview target");
+    }
+    return knowledgeBasesApi.fetchDocumentFile(
+      selected.id,
+      previewDocId,
+      "inline",
+    );
+  }, [selected, previewDocId]);
 
   const openCreateTextDocument = () => {
     setTextEditorMode("create");
@@ -1131,85 +1350,116 @@ export default function KnowledgeBasesPage() {
     }
   };
 
-  const renderDocumentActions = (document: KnowledgeDocument) => (
-    <div
-      className={styles.docCardActions}
-      data-kb-doc-actions=""
-      onClick={(event) => event.stopPropagation()}
-    >
-      {document.is_dir ? null : (
-        <Tooltip title={t("knowledgeBases.previewDocument")}>
-          <Button
-            type="text"
-            size="small"
-            icon={<Eye size={14} />}
-            aria-label={t("knowledgeBases.previewDocument")}
-            onClick={() => void openDocumentPreview(document.id)}
-          />
-        </Tooltip>
-      )}
-      {canWriteSelected ? (
-        <>
-          {!document.is_dir && isEditableKnowledgeDocument(document) ? (
-            <Tooltip title={t("knowledgeBases.editDocument")}>
-              <Button
-                type="text"
-                size="small"
-                icon={<Pencil size={14} />}
-                aria-label={t("knowledgeBases.editDocument")}
-                onClick={() => void openEditTextDocument(document)}
-              />
-            </Tooltip>
-          ) : null}
-          {document.is_dir ? null : (
-            <Popconfirm
-              title={t("knowledgeBases.rebuildDocumentConfirm")}
-              onConfirm={() => void rebuildDocument(document.id)}
+  const renderDocumentActions = (document: KnowledgeDocument) => {
+    const canPreview = canPreviewKnowledgeDocument(document);
+    const previewBtn = (
+      <Button
+        type="text"
+        size="small"
+        icon={<Eye size={14} />}
+        disabled={!canPreview}
+        aria-label={t("knowledgeBases.previewDocument")}
+        onClick={() => void openDocumentPreview(document)}
+      />
+    );
+    return (
+      <div
+        className={styles.docCardActions}
+        data-kb-doc-actions=""
+        onClick={(event) => event.stopPropagation()}
+      >
+        {document.is_dir ? null : (
+          <>
+            <Tooltip
+              title={
+                canPreview
+                  ? t("knowledgeBases.previewDocument")
+                  : t("knowledgeBases.previewUnsupported")
+              }
             >
-              <Tooltip title={t("knowledgeBases.rebuildDocument")}>
+              {canPreview ? previewBtn : <span>{previewBtn}</span>}
+            </Tooltip>
+            {canDownloadKnowledgeOriginal(document) ? (
+              <Tooltip title={t("knowledgeBases.downloadOriginal")}>
                 <Button
                   type="text"
                   size="small"
-                  icon={<RefreshCw size={14} />}
-                  aria-label={t("knowledgeBases.rebuildDocument")}
+                  icon={<Download size={14} />}
+                  aria-label={t("knowledgeBases.downloadOriginal")}
+                  onClick={() =>
+                    void downloadDocumentOriginal(
+                      document.id,
+                      document.filename,
+                    )
+                  }
                 />
               </Tooltip>
-            </Popconfirm>
-          )}
-          {document.is_dir ? (
-            <Tooltip title={t("knowledgeBases.renameFolder")}>
+            ) : null}
+          </>
+        )}
+        {canWriteSelected ? (
+          <>
+            {!document.is_dir && isEditableKnowledgeDocument(document) ? (
+              <Tooltip title={t("knowledgeBases.editDocument")}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<Pencil size={14} />}
+                  aria-label={t("knowledgeBases.editDocument")}
+                  onClick={() => void openEditTextDocument(document)}
+                />
+              </Tooltip>
+            ) : null}
+            {document.is_dir ? null : (
+              <Popconfirm
+                title={t("knowledgeBases.rebuildDocumentConfirm")}
+                onConfirm={() => void rebuildDocument(document.id)}
+              >
+                <Tooltip title={t("knowledgeBases.rebuildDocument")}>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<RefreshCw size={14} />}
+                    aria-label={t("knowledgeBases.rebuildDocument")}
+                  />
+                </Tooltip>
+              </Popconfirm>
+            )}
+            {document.is_dir ? (
+              <Tooltip title={t("knowledgeBases.renameFolder")}>
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<PencilLine size={14} />}
+                  aria-label={t("knowledgeBases.renameFolder")}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    openRenameFolder(document);
+                  }}
+                />
+              </Tooltip>
+            ) : null}
+            <Popconfirm
+              title={
+                document.is_dir
+                  ? t("knowledgeBases.deleteFolderConfirm")
+                  : t("knowledgeBases.deleteDocumentConfirm")
+              }
+              onConfirm={() => void deleteDocument(document.id)}
+            >
               <Button
                 type="text"
+                danger
                 size="small"
-                icon={<PencilLine size={14} />}
-                aria-label={t("knowledgeBases.renameFolder")}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  openRenameFolder(document);
-                }}
+                icon={<Trash2 size={14} />}
+                aria-label={t("common.delete")}
               />
-            </Tooltip>
-          ) : null}
-          <Popconfirm
-            title={
-              document.is_dir
-                ? t("knowledgeBases.deleteFolderConfirm")
-                : t("knowledgeBases.deleteDocumentConfirm")
-            }
-            onConfirm={() => void deleteDocument(document.id)}
-          >
-            <Button
-              type="text"
-              danger
-              size="small"
-              icon={<Trash2 size={14} />}
-              aria-label={t("common.delete")}
-            />
-          </Popconfirm>
-        </>
-      ) : null}
-    </div>
-  );
+            </Popconfirm>
+          </>
+        ) : null}
+      </div>
+    );
+  };
 
   const showListPane = !isMobile || mobilePane === "list";
   const showDetailPane = !isMobile || mobilePane === "detail";
@@ -1401,7 +1651,25 @@ export default function KnowledgeBasesPage() {
                           <span className={styles.listIcon}>
                             {knowledgeIconForName(base.icon_name, 18)}
                           </span>
-                          <span>{base.name}</span>
+                          <span className={styles.listNameText}>
+                            {base.name}
+                          </span>
+                          {canManageKnowledgeBase(base, user) || usable ? (
+                            <Dropdown
+                              menu={{ items: baseMenuItems(base) }}
+                              trigger={["click"]}
+                              placement="bottomRight"
+                            >
+                              <button
+                                type="button"
+                                className={styles.listMoreBtn}
+                                aria-label={t("common.more")}
+                                onClick={(event) => event.stopPropagation()}
+                              >
+                                <MoreHorizontal size={15} />
+                              </button>
+                            </Dropdown>
+                          ) : null}
                         </div>
                         <div className={styles.listDescription}>
                           {base.description ||
@@ -1503,37 +1771,6 @@ export default function KnowledgeBasesPage() {
                         >
                           {selected.name}
                         </Typography.Title>
-                        {canManageSelected ? (
-                          <div className={styles.titleActions}>
-                            <Tooltip title={t("common.edit")}>
-                              <Button
-                                type="text"
-                                size="small"
-                                className={styles.titleActionBtn}
-                                icon={<Pencil size={14} />}
-                                aria-label={t("common.edit")}
-                                onClick={openEdit}
-                              />
-                            </Tooltip>
-                            <Popconfirm
-                              title={t("knowledgeBases.deleteConfirm")}
-                              okText={t("common.delete")}
-                              cancelText={t("common.cancel")}
-                              onConfirm={() => void deleteBase()}
-                            >
-                              <Tooltip title={t("common.delete")}>
-                                <Button
-                                  type="text"
-                                  size="small"
-                                  danger
-                                  className={styles.titleActionBtn}
-                                  icon={<Trash2 size={14} />}
-                                  aria-label={t("common.delete")}
-                                />
-                              </Tooltip>
-                            </Popconfirm>
-                          </div>
-                        ) : null}
                       </div>
                     </div>
                     <Typography.Paragraph
@@ -1561,7 +1798,21 @@ export default function KnowledgeBasesPage() {
                     </div>
                   </div>
 
-                  <div className={styles.detailBody}>
+                  <div
+                    className={`${styles.detailBody}${
+                      dragActive ? ` ${styles.detailBodyDropActive}` : ""
+                    }`}
+                    onDragEnter={handleDocsDragEnter}
+                    onDragLeave={handleDocsDragLeave}
+                    onDragOver={handleDocsDragOver}
+                    onDrop={handleDocsDrop}
+                  >
+                    {dragActive && canDropUpload ? (
+                      <div className={styles.dropOverlay} aria-hidden>
+                        <FileUp size={36} strokeWidth={1.75} />
+                        <span>{t("knowledgeBases.dropToUpload")}</span>
+                      </div>
+                    ) : null}
                     <div
                       className={`${skillStyles.gridToolbar} ${styles.docsToolbar}`}
                     >
@@ -1737,7 +1988,11 @@ export default function KnowledgeBasesPage() {
                     {folderEntries.length === 0 ? (
                       <Empty
                         image={Empty.PRESENTED_IMAGE_SIMPLE}
-                        description={t("knowledgeBases.emptyDocuments")}
+                        description={
+                          canWriteSelected
+                            ? t("knowledgeBases.emptyDocumentsDropHint")
+                            : t("knowledgeBases.emptyDocuments")
+                        }
                       />
                     ) : showCardView ? (
                       <div className={styles.docCardGrid}>
@@ -1968,14 +2223,79 @@ export default function KnowledgeBasesPage() {
       <Modal
         title={previewFilename || t("knowledgeBases.previewDocument")}
         open={previewOpen}
-        onCancel={() => setPreviewOpen(false)}
-        footer={null}
-        width={720}
-        destroyOnClose
+        onCancel={() => {
+          setPreviewOpen(false);
+          setPreviewKind(null);
+          setPreviewDocId(null);
+          setPreviewHasOriginal(false);
+          setPreviewAsMarkdown(false);
+        }}
+        footer={
+          previewDocId && previewHasOriginal ? (
+            <Button
+              icon={<Download size={14} />}
+              onClick={() =>
+                void downloadDocumentOriginal(previewDocId, previewFilename)
+              }
+            >
+              {t("knowledgeBases.downloadOriginal")}
+            </Button>
+          ) : null
+        }
+        width={previewKind || previewAsMarkdown ? "min(1200px, 92vw)" : 720}
+        destroyOnHidden
+        styles={{
+          body:
+            previewKind || previewAsMarkdown
+              ? {
+                  height: "min(85vh, 900px)",
+                  maxHeight: "85vh",
+                  padding: 12,
+                  overflow: "hidden",
+                  display: "flex",
+                  flexDirection: "column",
+                }
+              : undefined,
+        }}
       >
-        <Spin spinning={previewLoading}>
-          <pre className={styles.previewBody}>{previewText}</pre>
-        </Spin>
+        {previewKind && previewDocId ? (
+          <div className={styles.richPreviewBody}>
+            <DocumentPreviewCore
+              kind={previewKind}
+              filename={previewFilename}
+              fetchBlob={fetchPreviewBlob}
+              onDownload={
+                previewHasOriginal
+                  ? () =>
+                      void downloadDocumentOriginal(
+                        previewDocId,
+                        previewFilename,
+                      )
+                  : undefined
+              }
+            />
+          </div>
+        ) : previewAsMarkdown ? (
+          <div className={styles.mdPreviewBody}>
+            <Spin
+              spinning={previewLoading}
+              wrapperClassName={styles.mdPreviewSpin}
+            >
+              {previewText.trim() &&
+              previewText !== t("knowledgeBases.previewEmpty") ? (
+                <Markdown content={stripFrontmatter(previewText)} />
+              ) : (
+                <span className={styles.mdPreviewEmpty}>
+                  {previewLoading ? "" : t("knowledgeBases.previewEmpty")}
+                </span>
+              )}
+            </Spin>
+          </div>
+        ) : (
+          <Spin spinning={previewLoading}>
+            <pre className={styles.previewBody}>{previewText}</pre>
+          </Spin>
+        )}
       </Modal>
 
       <Modal
@@ -1985,7 +2305,7 @@ export default function KnowledgeBasesPage() {
         onOk={() => void createFolder()}
         okText={t("common.create")}
         cancelText={t("common.cancel")}
-        destroyOnClose
+        destroyOnHidden
       >
         <Input
           value={folderName}
@@ -2002,7 +2322,7 @@ export default function KnowledgeBasesPage() {
         onOk={() => void renameFolder()}
         okText={t("common.save")}
         cancelText={t("common.cancel")}
-        destroyOnClose
+        destroyOnHidden
       >
         <Input
           value={renameName}
@@ -2024,16 +2344,26 @@ export default function KnowledgeBasesPage() {
         onSubmit={saveTextDocument}
       />
 
-      <Modal
-        title={t(editingBase ? "knowledgeBases.edit" : "knowledgeBases.create")}
-        open={baseModalOpen}
-        onCancel={() => setBaseModalOpen(false)}
-        onOk={() => void saveBase()}
-        okText={t(editingBase ? "common.save" : "common.create")}
-        cancelText={t("common.cancel")}
-        width={520}
-        destroyOnClose
-        className={styles.baseModal}
+      <Drawer
+        title={t(
+          editingBaseId ? "knowledgeBases.edit" : "knowledgeBases.create",
+        )}
+        placement="right"
+        open={baseDrawerOpen}
+        onClose={() => setBaseDrawerOpen(false)}
+        width={isMobile ? "100%" : 480}
+        destroyOnHidden
+        className={styles.baseDrawer}
+        footer={
+          <div className={styles.drawerFooter}>
+            <Button onClick={() => setBaseDrawerOpen(false)}>
+              {t("common.cancel")}
+            </Button>
+            <Button type="primary" onClick={() => void saveBase()}>
+              {t(editingBaseId ? "common.save" : "common.create")}
+            </Button>
+          </div>
+        }
       >
         <Form
           form={baseForm}
@@ -2110,7 +2440,7 @@ export default function KnowledgeBasesPage() {
             </div>
           </div>
         </Form>
-      </Modal>
+      </Drawer>
 
       <Drawer
         title={t("knowledgeBases.settingsTitle")}
