@@ -496,3 +496,5 @@ For the customer WeCom support group, scan:
 ## 📄 License
 
 This project is licensed under the [VeiSun Networks Software License Agreement](LICENSE): free for community and personal use; commercial use requires a commercial authorization from VeiSun Networks (威尚网络).
+
+Portions of this software are derived from the upstream [Octop](https://github.com/TencentCloud/Octop) project, which is MIT-licensed; see [NOTICE](NOTICE) for details.
