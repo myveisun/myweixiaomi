@@ -1,13 +1,13 @@
 #!/bin/bash
 #
-# Octop — 配置后回调（重新配置时调用）
+# Weixiaomi — 配置后回调（重新配置时调用）
 # 逻辑与 install_callback 一致：用新配置重写 .env。
 # 注意：修改管理员密码/账号不会改动已初始化的数据库（仅首次启动生效）；
 #       修改 LLM 密钥与日志级别会在容器重启后生效。
 #
 set -euo pipefail
 
-ENV_FILE="${TRIM_APPDEST:-/var/apps/octop/target}/docker/.env"
+ENV_FILE="${TRIM_APPDEST:-/var/apps/weixiaomi/target}/docker/.env"
 mkdir -p "$(dirname "$ENV_FILE")"
 
 ADMIN_USER="${wizard_admin_username:-admin}"
@@ -36,5 +36,5 @@ DASHSCOPE=$(sanitize "$DASHSCOPE")
 } > "$ENV_FILE"
 
 chmod 600 "$ENV_FILE"
-echo "[octop] 配置已更新: $ENV_FILE" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>/dev/null || true
+echo "[weixiaomi] 配置已更新: $ENV_FILE" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>/dev/null || true
 exit 0

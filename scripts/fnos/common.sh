@@ -27,7 +27,7 @@ free_octop_ports() {
         for pid in $pids; do
             [ -n "$pid" ] || continue
             if kill -TERM "$pid" 2>/dev/null; then
-                echo "[octop] 已发送 TERM 给占用 ${port} 的进程 ${pid}" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>/dev/null || true
+                echo "[weixiaomi] 已发送 TERM 给占用 ${port} 的进程 ${pid}" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>/dev/null || true
             fi
         done
         sleep 1
@@ -35,7 +35,7 @@ free_octop_ports() {
             [ -n "$pid" ] || continue
             if kill -0 "$pid" 2>/dev/null; then
                 kill -KILL "$pid" 2>/dev/null || true
-                echo "[octop] 已强制 KILL 占用 ${port} 的进程 ${pid}" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>/dev/null || true
+                echo "[weixiaomi] 已强制 KILL 占用 ${port} 的进程 ${pid}" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>/dev/null || true
             fi
         done
     done
@@ -45,7 +45,7 @@ free_octop_ports() {
     for pat in "$appdir/bin/octop" "$appdir/app/bin/octop"; do
         pids="$(pgrep -f -- "$pat" 2>/dev/null | tr '\n' ' ')" || true
         [ -z "$pids" ] && continue
-        echo "[octop] 发现本应用残留服务进程（$pat）: $pids，准备清理" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>&1 || true
+        echo "[weixiaomi] 发现本应用残留服务进程（$pat）: $pids，准备清理" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>&1 || true
         for pid in $pids; do
             kill -TERM "$pid" 2>/dev/null || true
         done
@@ -53,7 +53,7 @@ free_octop_ports() {
         for pid in $pids; do
             if kill -0 "$pid" 2>/dev/null; then
                 kill -KILL "$pid" 2>/dev/null || true
-                echo "[octop] 已强制 KILL 残留服务进程 ${pid}" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>&1 || true
+                echo "[weixiaomi] 已强制 KILL 残留服务进程 ${pid}" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>&1 || true
             fi
         done
     done
@@ -69,7 +69,7 @@ fix_ownership_and_perms() {
     local pkgvar="$1" envfile="$2"
     local octop_user="octop-native"
     id "$octop_user" >/dev/null 2>&1 || {
-        echo "[octop] 警告：${octop_user} 账户不存在，跳过数据目录 chown（服务将回退以 root 运行）" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>&1 || true
+        echo "[weixiaomi] 警告：${octop_user} 账户不存在，跳过数据目录 chown（服务将回退以 root 运行）" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>&1 || true
         return 0
     }
 
@@ -100,7 +100,7 @@ fix_ownership_and_perms() {
         fi
     fi
 
-    echo "[octop] 已修正数据目录/.env 属主与权限（${octop_user}:${octop_user}）" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>&1 || true
+    echo "[weixiaomi] 已修正数据目录/.env 属主与权限（${octop_user}:${octop_user}）" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>&1 || true
 }
 
 # ---------------------------------------------------------------------------

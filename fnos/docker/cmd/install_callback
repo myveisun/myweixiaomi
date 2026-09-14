@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Octop — 安装后回调
+# Weixiaomi — 安装后回调
 # 使用固定默认配置写入 docker-compose 同目录的 .env（安装向导已移除）。
 # docker compose 会自动加载该 .env，从而完成前后端参数配置。
 #
@@ -11,12 +11,12 @@ set -euo pipefail
 _OCTOP_COMMON=""$(dirname "$0")/common.sh""
 [ -f "$_OCTOP_COMMON" ] && source "$_OCTOP_COMMON"
 
-# 释放 Octop 端口（8088=Docker 版，8089=本地版），杀掉残留/孤儿进程，避免重装端口冲突。
+# 释放威小蜜AI 端口（8088=Docker 版，8089=本地版），杀掉残留/孤儿进程，避免重装端口冲突。
 
 
 free_octop_ports
 
-ENV_FILE="${TRIM_APPDEST:-/var/apps/octop/target}/docker/.env"
+ENV_FILE="${TRIM_APPDEST:-/var/apps/weixiaomi/target}/docker/.env"
 mkdir -p "$(dirname "$ENV_FILE")"
 
 # 安装向导已移除，使用固定默认值（用户首次登录后可在控制台「设置」中修改）。
@@ -47,5 +47,5 @@ DASHSCOPE=$(sanitize "$DASHSCOPE")
 } > "$ENV_FILE"
 
 chmod 600 "$ENV_FILE"
-echo "[octop] 已写入配置: $ENV_FILE" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>/dev/null || true
+echo "[weixiaomi] 已写入配置: $ENV_FILE" > "${TRIM_TEMP_LOGFILE:-/dev/null}" 2>/dev/null || true
 exit 0

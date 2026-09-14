@@ -1,4 +1,4 @@
-name: Build Octop FPK
+name: Build Weixiaomi FPK
 
 # FnOS (飞牛 NAS) 安装包流水线。
 #
@@ -8,7 +8,7 @@ name: Build Octop FPK
 #
 # 制品复用：
 #   - Docker 镜像：不再重建，等待 docker-publish 推送的
-#     ghcr.io/tencentcloud/octop:{version|latest}
+#     ghcr.io/myveisun/weixiaomi-commercial:{version|latest}
 #   - Native wheel：优先从同版本 GitHub Release（v*）下载；
 #     缺失时再回退到本仓源码构建
 #   - 产物挂到同一个 v* GitHub Release（与 wheel / 桌面包并列），不再单独打 fnos-* tag
@@ -154,7 +154,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: dashboard/package-lock.json
 
-      - name: Build Octop wheel from current source
+      - name: Build Weixiaomi wheel from current source
         if: steps.wheel.outputs.source == 'build'
         run: |
           set -e
@@ -171,7 +171,7 @@ jobs:
           echo "=== built wheel ==="
           ls -lh dist/octop-*.whl
 
-      - name: Install Octop core into app/site-packages (no Chromium, no preinstalled skills)
+      - name: Install Weixiaomi core into app/site-packages (no Chromium, no preinstalled skills)
         id: install_core
         timeout-minutes: 15
         env:

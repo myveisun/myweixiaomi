@@ -9,11 +9,11 @@
 <p align="center">
   <a href="https://www.python.org/downloads/"><img alt="Python 3.12+" src="https://img.shields.io/badge/python-3.12%2B-blue?logo=python&logoColor=white" /></a>
   <a href="https://github.com/myveisun/myweixiaomi/blob/main/LICENSE"><img alt="License: VeiSun" src="https://img.shields.io/badge/license-VeiSun-39559e" /></a>
-  <a href="https://github.com/TencentCloud/Octop/releases"><img alt="Version" src="https://img.shields.io/badge/version-0.9.32-orange" /></a>
+  <a href="https://github.com/myveisun/myweixiaomi/releases"><img alt="Version" src="https://img.shields.io/badge/version-1.2.1-orange" /></a>
   <a href="https://pypi.org/project/octop/"><img src="https://img.shields.io/pypi/v/octop" alt="PyPI" /></a>
   <a href="https://github.com/astral-sh/ruff"><img alt="Code Style: Ruff" src="https://img.shields.io/badge/code%20style-ruff-000000?logo=ruff&logoColor=white" /></a>
-  <a href="https://github.com/TencentCloud/Octop"><img alt="GitHub stars" src="https://img.shields.io/github/stars/TencentCloud/Octop?style=social" /></a>
-  <a href="https://github.com/TencentCloud/Octop/fork"><img alt="GitHub forks" src="https://img.shields.io/github/forks/TencentCloud/Octop?style=social" /></a>
+  <a href="https://github.com/myveisun/myweixiaomi"><img alt="GitHub stars" src="https://img.shields.io/github/stars/myveisun/myweixiaomi?style=social" /></a>
+  <a href="https://github.com/myveisun/myweixiaomi/fork"><img alt="GitHub forks" src="https://img.shields.io/github/forks/myveisun/myweixiaomi?style=social" /></a>
   <a href="https://discord.gg/jPas5J8Ua"><img alt="Discord" src="https://img.shields.io/badge/Discord-Join%20Us-5865F2?logo=discord&logoColor=white" /></a>
 </p>
 
@@ -183,14 +183,14 @@ curl -fsSL https://finnie-1258344699.cos.ap-guangzhou.myqcloud.com/octop/install
 
 See [scripts/README.md](scripts/README.md) for all install options (`--version`, `--from-source`, `--mirror`, Windows flags).
 
-**Desktop app** (GUI, no terminal) — grab the artifact for your platform from [GitHub Releases](https://github.com/TencentCloud/Octop/releases/latest):
+**Desktop app** (GUI, no terminal) — grab the artifact for your platform from [GitHub Releases](https://github.com/myveisun/myweixiaomi/releases/latest):
 
 | Platform | Artifact |
 |----------|----------|
-| Windows | `Octop-desktop-windows-amd64-<version>.exe` (64-bit) / `Octop-desktop-windows-arm64-<version>.exe` (ARM64) — NSIS installer |
-| macOS | `Octop-desktop-darwin-arm64-<version>.dmg` (Apple Silicon) / `Octop-desktop-darwin-amd64-<version>.dmg` (Intel) |
-| Linux | `Octop-desktop-linux-amd64-<version>.tar.gz` / `Octop-desktop-linux-arm64-<version>.tar.gz` |
-| FnOS NAS | `Octop-fnos-docker-<version>.fpk` (Docker-backed) / `Octop-fnos-native-<version>.fpk` (no Docker) — install via App Center |
+| Windows | `Weixiaomi-desktop-windows-amd64-<version>.exe` (64-bit) / `Weixiaomi-desktop-windows-arm64-<version>.exe` (ARM64) — NSIS installer |
+| macOS | `Weixiaomi-desktop-darwin-arm64-<version>.dmg` (Apple Silicon) / `Weixiaomi-desktop-darwin-amd64-<version>.dmg` (Intel) |
+| Linux | `Weixiaomi-desktop-linux-amd64-<version>.tar.gz` / `Weixiaomi-desktop-linux-arm64-<version>.tar.gz` |
+| FnOS NAS | `Weixiaomi-fnos-docker-<version>.fpk` (Docker-backed) / `Weixiaomi-fnos-native-<version>.fpk` (no Docker) — install via App Center |
 
 See [desktop/README.md](desktop/README.md) for the desktop shell and [fnos/README.md](fnos/README.md) for the FnOS packaging guide.
 

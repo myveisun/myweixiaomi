@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 构建 Octop 飞牛 FnOS 安装包 (.fpk)
+# 构建 Weixiaomi 飞牛 FnOS 安装包 (.fpk)
 #
 # 直接使用官方 fnpack CLI 打包（fnpack 在生成 .fpk 前会校验 manifest / cmd /
 # config / wizard / app 等结构，确保产物与飞牛 fnOS 安装校验完全一致）。
 #
 # 用法（在仓库根目录执行):
-#   bash scripts/build-fpk.sh docker      # 构建 Docker 版  -> dist/Octop-fnos-docker-<ver>.fpk
-#   bash scripts/build-fpk.sh native      # 构建本地版(非Docker) -> dist/Octop-fnos-native-<ver>.fpk
+#   bash scripts/build-fpk.sh docker      # 构建 Docker 版  -> dist/Weixiaomi-fnos-docker-<ver>.fpk
+#   bash scripts/build-fpk.sh native      # 构建本地版(非Docker) -> dist/Weixiaomi-fnos-native-<ver>.fpk
 #   bash scripts/build-fpk.sh             # 两个都构建
 #
 # 环境变量：
-#   FPK_NAME_PREFIX  输出文件名前缀，默认 "octop"
-#                    例如 FPK_NAME_PREFIX=Octop-fnos 会生成 Octop-fnos-docker-<ver>.fpk / Octop-fnos-native-<ver>.fpk
+#   FPK_NAME_PREFIX  输出文件名前缀，默认 "weixiaomi"
+#                    例如 FPK_NAME_PREFIX=Weixiaomi-fnos 会生成 Weixiaomi-fnos-docker-<ver>.fpk / Weixiaomi-fnos-native-<ver>.fpk
 #   FPK_ITER         迭代号，默认空
 #                    例如 FPK_ITER=01 会生成 ...-<ver>-01.fpk（通常不需要，按版本号发布）
 #
@@ -34,10 +34,10 @@ trap cleanup EXIT
 
 VER="$(grep -m1 '^version' "$ROOT/pyproject.toml" | sed -E 's/.*"([0-9][0-9.]*[0-9])".*/\1/')"
 [ -n "$VER" ] || { echo "无法从 pyproject.toml 解析版本"; exit 1; }
-echo "[build-fpk] Octop 版本: $VER"
+echo "[build-fpk] Weixiaomi 版本: $VER"
 
-# 输出文件名前缀与迭代号（由 CI 传入，实现 Octop-fnos-docker-0.9.30.fpk 风格）
-PREFIX="${FPK_NAME_PREFIX:-octop}"
+# 输出文件名前缀与迭代号（由 CI 传入，实现 Weixiaomi-fnos-docker-1.1.0.fpk 风格）
+PREFIX="${FPK_NAME_PREFIX:-weixiaomi}"
 ITER_SUFFIX=""
 if [ -n "${FPK_ITER:-}" ]; then
   ITER_SUFFIX="-$FPK_ITER"

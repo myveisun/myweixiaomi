@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Octop — FnOS 生命周期管理（docker-project）
+# Weixiaomi — FnOS 生命周期管理（docker-project）
 # start/stop 由 fnOS 应用中心根据 config/resource 的 docker-project 自动管理；
 # 本脚本仅负责状态检查（供系统健康检查轮询）。
 #

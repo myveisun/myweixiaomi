@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a defect or unexpected behavior in Octop
+about: Report a defect or unexpected behavior in Weixiaomi
 title: "[bug] "
 labels: bug
 ---

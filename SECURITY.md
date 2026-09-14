@@ -11,14 +11,14 @@
 
 **Please do not open a public GitHub issue for security vulnerabilities.**
 
-- **GitHub Security Advisory:** [Create advisory](https://github.com/TencentCloud/Octop/security/advisories/new)
+- **GitHub Security Advisory:** [Create advisory](https://github.com/myveisun/myweixiaomi/security/advisories/new)
 - **Email:** jubaoliang@gmail.com
 
 We aim to acknowledge reports within **3 business days** and provide a fix timeline within **7 business days** for confirmed issues.
 
 ## Scope
 
-Octop is a self-hosted control plane. Operators are responsible for:
+Weixiaomi (威小蜜AI) is a self-hosted control plane. Operators are responsible for:
 
 - Securing the host and network exposure of `octop run`
 - Rotating JWT secrets and admin credentials

@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 # =============================================================================
-# Octop — FnOS 专用构建（基于仓库源码，安装全部附加组件）
+# Weixiaomi — FnOS 专用构建（基于仓库源码，安装全部附加组件）
 #
 # 与上游 docker/Dockerfile 一致，但显式安装 desktop extra：
 #   - desktop  （mss / pynput / pillow，桌面控制附加组件）
 # Playwright Chromium 不再预装，浏览器自动化可在控制台按需安装。
 #
 # 构建上下文必须为仓库根目录（fnpack / CI 中以仓库根为 context）：
-#   docker build -f fnos/docker/Dockerfile -t ghcr.io/tencentcloud/octop:latest .
+#   docker build -f fnos/docker/Dockerfile -t ghcr.io/myveisun/weixiaomi-commercial:latest .
 #
 # 国内加速（可选 build-arg）：
 #   PIP_INDEX_URL / PIP_TRUSTED_HOST / NPM_REGISTRY / APT_MIRROR
@@ -37,10 +37,10 @@ RUN NODE_ENV=production NODE_OPTIONS="--max-old-space-size=${NODE_MAX_OLD_SPACE_
 # ---------------------------------------------------------------------------
 FROM python:3.12-slim AS runtime
 
-LABEL maintainer="TencentCloud OrcaKit"
-LABEL org.opencontainers.image.title="Octop"
+LABEL maintainer="VeiSun Networks"
+LABEL org.opencontainers.image.title="Weixiaomi"
 LABEL org.opencontainers.image.description="Smarter self-hosted AI assistant — multi-user, multi-agent (FnOS build with all addons)."
-LABEL org.opencontainers.image.source="https://github.com/TencentCloud/Octop"
+LABEL org.opencontainers.image.source="https://github.com/myveisun/weixiaomi-commercial"
 LABEL org.opencontainers.image.licenses="VeiSun"
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
