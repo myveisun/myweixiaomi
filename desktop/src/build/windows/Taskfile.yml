@@ -69,7 +69,7 @@ tasks:
       ARCHIVE: '{{.BIN_DIR}}/{{.APP_NAME}}-desktop-windows-{{.ARCH}}-{{.VERSION}}.exe'
 
   create:nsis:installer:
-    summary: Wraps Octop.exe in an NSIS installer (Program Files + shortcuts)
+    summary: Wraps Weixiaomi.exe in an NSIS installer (Program Files + shortcuts)
     dir: build/windows/nsis
     preconditions:
       - sh: makensis -VERSION

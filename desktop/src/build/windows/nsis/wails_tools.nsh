@@ -1,4 +1,4 @@
-# Shared NSIS helpers for the Octop desktop installer.
+# Shared NSIS helpers for the Weixiaomi desktop installer.
 # INFO_PRODUCTVERSION fallback for a local makensis without -D.
 # Release packaging passes -DINFO_PRODUCTVERSION from pyproject.toml.
 
