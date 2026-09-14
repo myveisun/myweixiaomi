@@ -1,9 +1,9 @@
 Unicode true
 
-# Octop desktop NSIS installer.
+# Weixiaomi desktop NSIS installer.
 # Built by `wails3 task package` on a Windows runner:
-#   makensis -DARG_WAILS_AMD64_BINARY=..\..\..\bin\Octop.exe project.nsi
-#   makensis -DARG_WAILS_ARM64_BINARY=..\..\..\bin\Octop.exe project.nsi
+#   makensis -DARG_WAILS_AMD64_BINARY=..\..\..\bin\Weixiaomi.exe project.nsi
+#   makensis -DARG_WAILS_ARM64_BINARY=..\..\..\bin\Weixiaomi.exe project.nsi
 
 !include "wails_tools.nsh"
 
