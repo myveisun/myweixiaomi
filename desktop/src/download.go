@@ -283,7 +283,7 @@ func bundledPortableZip() (string, error) {
 	}
 	dir := filepath.Dir(exe)
 	plat := greenPlat()
-	legacy := fmt.Sprintf("Octop-%s.zip", plat)
+	legacy := fmt.Sprintf("Weixiaomi-%s.zip", plat)
 	searchDirs := []string{
 		dir,
 		filepath.Join(dir, "..", "Resources"),
@@ -294,7 +294,7 @@ func bundledPortableZip() (string, error) {
 		if _, err := os.Stat(legacyPath); err == nil {
 			return legacyPath, nil
 		}
-		matches, _ := filepath.Glob(filepath.Join(search, "Octop-portable-"+plat+"-*.zip"))
+		matches, _ := filepath.Glob(filepath.Join(search, "Weixiaomi-portable-"+plat+"-*.zip"))
 		if len(matches) > 0 {
 			sort.Strings(matches)
 			return matches[len(matches)-1], nil
@@ -325,7 +325,7 @@ func unzipGreenFiles(files []*zip.File, dest string) error {
 	if err := os.MkdirAll(dest, 0o755); err != nil {
 		return err
 	}
-	// Zip root is Octop-<plat>/… — strip that prefix.
+	// Zip root is <brand>-<plat>/… — strip that prefix.
 	for _, f := range files {
 		name := f.Name
 		parts := strings.SplitN(name, "/", 2)

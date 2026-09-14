@@ -40,7 +40,7 @@ func TestEnsurePortableUsesBundledPackage(t *testing.T) {
 	home := t.TempDir()
 	t.Setenv("OCTOP_HOME", home)
 
-	zipPath := filepath.Join(t.TempDir(), "Octop-"+greenPlat()+".zip")
+	zipPath := filepath.Join(t.TempDir(), "Weixiaomi-"+greenPlat()+".zip")
 	t.Setenv("OCTOP_DESKTOP_PORTABLE_ZIP", zipPath)
 	writeTestGreenZip(t, zipPath, "1.0.0")
 

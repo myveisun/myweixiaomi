@@ -5,11 +5,11 @@
 version: "3"
 
 info:
-  companyName: "Octop"
-  productName: "Octop"
-  productIdentifier: "com.tencent.octop"
-  description: "Octop desktop shell"
-  copyright: "(c) 2026, Octop"
+  companyName: "VeiSun Networks"
+  productName: "Weixiaomi"
+  productIdentifier: "com.veisun.weixiaomi"
+  description: "Weixiaomi AI desktop shell"
+  copyright: "(c) 2026, VeiSun Networks"
   comments: "Wails v3 + green portable"
   version: "0.9.26"
 
