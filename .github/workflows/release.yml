@@ -67,6 +67,9 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     environment: pypi
+    # 品牌版不自动发布到公开 PyPI 的 octop 包：未配置 PYPI_API_TOKEN 时该步骤
+    # 安全失败并跳过，不影响下方 GitHub Release 创建。
+    continue-on-error: true
     steps:
       - name: Download distributions
         uses: actions/download-artifact@v4
@@ -81,7 +84,7 @@ jobs:
 
   github-release:
     name: Create GitHub Release
-    needs: publish
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
