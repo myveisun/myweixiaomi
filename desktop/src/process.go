@@ -23,10 +23,11 @@ func startOctop(root string, port int) (*exec.Cmd, error) {
 	cmd := exec.Command(py, launch, "run", "--host", "127.0.0.1", "--port", strconv.Itoa(port))
 	cmd.Dir = root
 	mustEnv(cmd, map[string]string{
-		"OCTOP_HOME":           octopHome(),
-		"OCTOP_GREEN_PACKAGES": filepath.Join(root, "packages"),
-		"PYTHONNOUSERSITE":     "1",
-		"PYTHONPATH":           "",
+		"OCTOP_HOME":               octopHome(),
+		"OCTOP_GREEN_PACKAGES":     filepath.Join(root, "packages"),
+		"PLAYWRIGHT_BROWSERS_PATH": filepath.Join(dataRoot(), "browsers"),
+		"PYTHONNOUSERSITE":         "1",
+		"PYTHONPATH":               "",
 	})
 	configureProcGroup(cmd)
 	if runtime.GOOS == "linux" {

@@ -172,6 +172,11 @@ func (a *App) boot() {
 	}
 	s := a.store.get()
 	a.setStatus(desktopText(locale, copyStatusCheckingRuntime))
+	// Move legacy ~/.octop data into the new EXE-relative root before any SQLite
+	// access (including ensurePortable's upgrade backup). Non-fatal on failure.
+	if err := maybeMigrateLegacyData(); err != nil {
+		a.setStatus(desktopText(locale, copyMigrateLegacyFailed, err.Error()))
+	}
 	if err := ensurePortable(locale, a.setStatus); err != nil {
 		a.setStatus(err.Error())
 		return

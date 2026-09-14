@@ -34,9 +34,37 @@ func defaultSettings() Settings {
 	}
 }
 
-func octopHome() string {
+// executablePath is a seam for tests; production resolves the real running binary.
+var executablePath = os.Executable
+
+// dirWritable reports whether we can create a probe file under dir (mkdir -p first).
+// Used to decide whether data can live next to the EXE (e.g. NOT under Program Files
+// where a normal user lacks write permission).
+func dirWritable(dir string) bool {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return false
+	}
+	probe := filepath.Join(dir, ".write-test")
+	if err := os.WriteFile(probe, []byte("ok"), 0o644); err != nil {
+		return false
+	}
+	_ = os.Remove(probe)
+	return true
+}
+
+// dataRoot resolves the single data root directory with this priority:
+//  1. OCTOP_HOME env var (highest — respects manual override and existing tests)
+//  2. a "user-data" subdirectory next to the executable, when writable
+//  3. fallback to ~/.octop (e.g. EXE under read-only Program Files)
+func dataRoot() string {
 	if v := os.Getenv("OCTOP_HOME"); v != "" {
 		return v
+	}
+	if exe, err := executablePath(); err == nil {
+		candidate := filepath.Join(filepath.Dir(exe), "user-data")
+		if dirWritable(candidate) {
+			return candidate
+		}
 	}
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -45,12 +73,26 @@ func octopHome() string {
 	return filepath.Join(home, ".octop")
 }
 
+func octopHome() string {
+	return dataRoot()
+}
+
 func portableDir() string {
 	return filepath.Join(octopHome(), "portable")
 }
 
 func settingsPath() string {
 	return filepath.Join(octopHome(), "desktop-settings.json")
+}
+
+// legacyHomeDir returns the historical fixed data root used before data started
+// following the EXE. Only used by the one-time data migration (see migrate.go).
+func legacyHomeDir() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ".octop"
+	}
+	return filepath.Join(home, ".octop")
 }
 
 type settingsStore struct {

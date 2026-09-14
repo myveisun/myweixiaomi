@@ -15,6 +15,7 @@ const (
 	copyStatusUpdateFailedKeep  = "status.update_failed_keep"
 	copyErrorBackupFailed       = "error.backup_failed"
 	copyErrorUpgradeFailed      = "error.upgrade_failed"
+	copyMigrateLegacyFailed     = "error.migrate_legacy_failed"
 	copyWait1Minute            = "wait.1_minute"
 	copyWaitNMinutes           = "wait.n_minutes"
 	copyWait1Second            = "wait.1_second"
@@ -38,6 +39,7 @@ var desktopCopy = map[Locale]map[string]string{
 		copyStatusUpdateFailedKeep: "Runtime update failed; using the existing runtime…",
 		copyErrorBackupFailed:      "Database backup failed before upgrade; the current version was preserved",
 		copyErrorUpgradeFailed:     "Desktop runtime upgrade failed; the current version was preserved",
+		copyMigrateLegacyFailed:    "Could not move existing data to the installation folder (%s); continuing with the previous data location.",
 		copyWait1Minute:            "1 minute",
 		copyWaitNMinutes:           "%d minutes",
 		copyWait1Second:            "1 second",
@@ -59,6 +61,7 @@ var desktopCopy = map[Locale]map[string]string{
 		copyStatusUpdateFailedKeep: "更新内置运行环境失败，继续使用已有运行环境…",
 		copyErrorBackupFailed:      "升级前数据库备份失败，已保留当前版本",
 		copyErrorUpgradeFailed:     "客户端运行环境升级失败，已保留当前版本",
+		copyMigrateLegacyFailed:    "无法将已有数据迁移到安装目录（%s），继续使用原数据位置。",
 		copyWait1Minute:            "1 分钟",
 		copyWaitNMinutes:           "%d 分钟",
 		copyWait1Second:            "1 秒",

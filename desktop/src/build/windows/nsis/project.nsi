@@ -81,15 +81,38 @@ SectionEnd
 Section "uninstall"
     !insertmacro wails.setShellContext
 
-    RMDir /r "$AppData\${PRODUCT_EXECUTABLE}"
+    # Ask whether to also delete local user data (database, chats, agents, …).
+    # Default is NO — keep the data at $INSTDIR\user-data.
+    MessageBox MB_YESNO|MB_ICONQUESTION|MB_DEFBUTTON2 \
+        "Do you also want to delete local data (database, chats, agents, etc.)?$\r$\n$\r$\n    Yes — delete them alongside the application.    $\r$\n    No (recommended) — keep them for a future install." \
+        IDYES deleteAll IDNO keepData
 
-    RMDir /r $INSTDIR
+    keepData:
+        # Remove the application but preserve $INSTDIR\user-data.
+        RMDir /r "$INSTDIR\asserts"
+        RMDir /r "$INSTDIR\build"
+        RMDir /r "$INSTDIR\runtime"
+        RMDir /r "$INSTDIR\packages"
+        # Remove remaining top-level files but keep unknown dirs (e.g. user-data).
+        Delete "$INSTDIR\*.exe"
+        Delete "$INSTDIR\*.json"
+        Delete "$INSTDIR\*.py"
+        Delete "$INSTDIR\*.txt"
+        RMDir "$INSTDIR"
+        Goto finish
 
-    Delete "$SMPROGRAMS\${INFO_PRODUCTNAME}.lnk"
-    Delete "$DESKTOP\${INFO_PRODUCTNAME}.lnk"
+    deleteAll:
+        # Full removal including $INSTDIR\user-data and any legacy ~/.octop remnants.
+        RMDir /r $INSTDIR
+        IfFileExists "$USERPROFILE\.octop" 0 finish
+        RMDir /r "$USERPROFILE\.octop"
 
-    !insertmacro wails.unassociateFiles
-    !insertmacro wails.unassociateCustomProtocols
+    finish:
+        Delete "$SMPROGRAMS\${INFO_PRODUCTNAME}.lnk"
+        Delete "$DESKTOP\${INFO_PRODUCTNAME}.lnk"
 
-    !insertmacro wails.deleteUninstaller
+        !insertmacro wails.unassociateFiles
+        !insertmacro wails.unassociateCustomProtocols
+
+        !insertmacro wails.deleteUninstaller
 SectionEnd
