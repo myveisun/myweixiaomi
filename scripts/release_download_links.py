@@ -12,7 +12,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-GITHUB_REPO = "TencentCloud/Octop"
+GITHUB_REPO = "myveisun/myweixiaomi"
 DOWNLOAD_BASE = f"https://github.com/{GITHUB_REPO}/releases/download"
 
 
@@ -34,11 +34,11 @@ def md_link(label: str, tag: str, filename: str) -> str:
 
 
 def desktop_name(os_name: str, arch: str, version: str, ext: str) -> str:
-    return f"Octop-desktop-{os_name}-{arch}-{version}.{ext}"
+    return f"Weixiaomi-desktop-{os_name}-{arch}-{version}.{ext}"
 
 
 def portable_name(os_name: str, arch: str, version: str) -> str:
-    return f"Octop-portable-{os_name}-{arch}-{version}.zip"
+    return f"Weixiaomi-portable-{os_name}-{arch}-{version}.zip"
 
 
 def render_download_section(raw_version: str) -> str:
@@ -55,8 +55,8 @@ def render_download_section(raw_version: str) -> str:
     linux_arm = md_link("ARM64", tag, desktop_name("linux", "arm64", version, "tar.gz"))
     linux64_zip = md_link("64-bit", tag, portable_name("linux", "amd64", version))
     linux_arm_zip = md_link("ARM64", tag, portable_name("linux", "arm64", version))
-    fnos_docker = md_link("Docker", tag, f"Octop-fnos-docker-{version}.fpk")
-    fnos_native = md_link("Native", tag, f"Octop-fnos-native-{version}.fpk")
+    fnos_docker = md_link("Docker", tag, f"Weixiaomi-fnos-docker-{version}.fpk")
+    fnos_native = md_link("Native", tag, f"Weixiaomi-fnos-native-{version}.fpk")
     return "\n".join(
         [
             "",

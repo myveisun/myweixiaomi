@@ -22,7 +22,7 @@ Platforms:
   windows-arm64 windows-amd64
 
 The platform defaults to the current native host. --reuse-portable skips
-rebuilding desktop/portable/release/Octop-portable-<platform>-<version>.zip when it already exists.
+rebuilding desktop/portable/release/Weixiaomi-portable-<platform>-<version>.zip when it already exists.
 EOF
 }
 
@@ -80,7 +80,7 @@ else
   bash "${REPO_ROOT}/desktop/portable/package.sh" "$plat"
 fi
 
-staging="${REPO_ROOT}/desktop/portable/release/Octop-${plat}"
+staging="${REPO_ROOT}/desktop/portable/release/Weixiaomi-${plat}"
 requirements="${REPO_ROOT}/desktop/portable/requirements-${plat}.txt"
 if [[ "$plat" == windows-* ]]; then
   portable_python="${staging}/runtime/python.exe"

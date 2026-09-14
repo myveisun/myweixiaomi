@@ -11,13 +11,13 @@
 #   OCTOP_GREEN_OFFLINE=1 bash desktop/portable/package.sh   # require local wheels
 #
 # Layout of each zip:
-#   Octop-<plat>/
+#   Weixiaomi-<plat>/
 #     runtime/     portable CPython
 #     packages/    site-packages (uv --target, relocatable)
 #     start.sh / start.bat
 #     README.txt
 #
-# Public filename is Octop-portable-<plat>-<version>.zip (see portable_zip_basename).
+# Public filename is Weixiaomi-portable-<plat>-<version>.zip (see portable_zip_basename).
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
@@ -84,7 +84,7 @@ assemble_one() {
   local plat="$1"
   local runtime="${GREEN_RUNTIMES}/${plat}"
   local wheel_dir="${GREEN_WHEELS}/${plat}"
-  local staging="${GREEN_RELEASE}/Octop-${plat}"
+  local staging="${GREEN_RELEASE}/Weixiaomi-${plat}"
   local zip_path="${GREEN_RELEASE}/$(portable_zip_basename "$plat")"
   local pyplat
 
@@ -262,7 +262,7 @@ assemble_one() {
   (
     cd "$GREEN_RELEASE"
     if command -v zip >/dev/null 2>&1; then
-      zip -qry "$zip_name" "Octop-${plat}"
+      zip -qry "$zip_name" "Weixiaomi-${plat}"
     else
       # Windows runners often have `python` but not `python3` / `zip`.
       py=""
@@ -275,7 +275,7 @@ assemble_one() {
         echo "[package] need zip or python to create archive" >&2
         exit 1
       fi
-      "$py" -c "import shutil; shutil.make_archive('${zip_stem}', 'zip', '.', 'Octop-${plat}')"
+      "$py" -c "import shutil; shutil.make_archive('${zip_stem}', 'zip', '.', 'Weixiaomi-${plat}')"
     fi
   )
   echo "[package] wrote ${zip_path}"
