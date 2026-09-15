@@ -4,15 +4,11 @@ name: Release
 #   - Sync Main Into Develop
 #   - Build Octop FPK（复用本 Release 的 wheel；等待 docker-publish 的 GHCR 镜像）
 #
-# 与 docker-publish.yml / octop-desktop.yml 并行（由 Auto Tag 同时 dispatch，
-# 或人工 push v* tag 同时触发）。桌面产物由 Desktop Package 挂到同一 GitHub Release。
+# 本仓（公开品牌仓）不监听 v* tag 推送：发布物由商业仓构建并镜像到本仓的 v*
+# Release，tag 推送再触发一轮本仓构建只会重复产出上游版本号的包。保留
+# workflow_dispatch，供人工在 v* ref 上补跑（job 内仍有 tag ref 校验）。
 
 on:
-  push:
-    tags:
-      - "v*"
-  # Allow Auto Tag On Release Merge to cascade after a GITHUB_TOKEN tag push
-  # (token-authored pushes do not retrigger push workflows).
   workflow_dispatch:
 
 permissions:

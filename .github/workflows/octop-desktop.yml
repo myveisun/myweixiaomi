@@ -1,13 +1,12 @@
 name: Octop Desktop Package
 
-# 正式发版：Auto Tag 在打 v* 后与 Release / Docker Publish 一并 dispatch。
-# 产物 upsert 到同一 GitHub Release。手工补包：workflow_dispatch + release_tag
-# （不必跑在 v* ref 上）。attach_from_run 只挂已有 artifact、不重打。
+# 本仓（公开品牌仓）不产出发布物：桌面安装包由商业仓构建后镜像到本仓的 v*
+# Release。因此这里不监听 v* tag 推送 —— 否则每次发版都会在本仓重跑一遍
+# 6 平台构建，既吃 Actions 存储配额，又会把上游版本号的产物混进同一个 Release。
+# 保留 pull_request（验证 desktop/ 改动）与 workflow_dispatch（手工补包，
+# 不必跑在 v* ref 上；attach_from_run 只挂已有 artifact、不重打）。
 
 on:
-  push:
-    tags:
-      - "v*"
   pull_request:
     paths:
       - "desktop/**"
